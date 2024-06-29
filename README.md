@@ -15,7 +15,7 @@ The local development setup consists of 2 parts.
 
 ### Firestore Emulator
 
-To launch the firestore emulator run `make db`
+To launch the firestore emulator run `./build.sh db`
 
 It should stand up a local instance of firestore that can be used to test the application.
 
@@ -23,7 +23,7 @@ Exit with Ctrl+c
 
 ### The AMA API
 
-To launch the API locally just run `make run` and the api will spin up.
+To launch the API locally just run `./build.sh run` and the api will spin up. Just make sure the database is also up if you intend to try and hit the API.
 
 Exit with Ctrl+c
 
@@ -35,4 +35,4 @@ Take a look at the Dockerfile for details.
 
 ## Testing
 
-I plan to set up unit testing and maybe somewhere some integration testing. I have not done golang unit tests before so I hope to learn some about how to do that here.
+Run unit tests using the `./build.sh test` script and run integration tests after standing up the API and database using `./test.sh`.
