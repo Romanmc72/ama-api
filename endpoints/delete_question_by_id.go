@@ -12,7 +12,7 @@ import (
 )
 
 // DeleteQuestionById(c *gin.Context) will delete one question using its id.
-func DeleteQuestionById(c *gin.Context, db interfaces.QuestionDeleter) {
+func DeleteQuestionById(c interfaces.APIContext, db interfaces.QuestionDeleter) {
 	logger := logging.GetLogger()
 	id := c.Param("id")
 	deleteTime, err := db.DeleteQuestion(id)

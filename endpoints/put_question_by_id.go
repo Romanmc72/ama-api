@@ -3,8 +3,6 @@ package endpoints
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"ama/api/application"
 	"ama/api/interfaces"
 	"ama/api/logging"
@@ -12,7 +10,7 @@ import (
 
 // PutQuestionsById(c *gin.Context) will update an existing question in the database.
 // If the question does not exist it will be created.
-func PutQuestionById(c *gin.Context, db interfaces.QuestionWriter) {
+func PutQuestionById(c interfaces.APIContext, db interfaces.QuestionWriter) {
 	id := c.Param("id")
 	var newQuestion application.NewQuestion
 	logger := logging.GetLogger()

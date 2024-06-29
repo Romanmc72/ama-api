@@ -4,8 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-
+	"ama/api/interfaces"
 	"ama/api/logging"
 	"ama/api/paths"
 )
@@ -14,7 +13,7 @@ import (
 // https://gin-gonic.com/docs/examples/querystring-param/
 // Retrieves a url query parameter and parses it to an int if it is set.
 // If it is not set it will return the input default value.
-func GetQueryParamToInt(c *gin.Context, paramName string, defaultValue int) int {
+func GetQueryParamToInt(c interfaces.APIContext, paramName string, defaultValue int) int {
 	rawValue := c.DefaultQuery(paramName, strconv.Itoa(defaultValue))
 	value, err := strconv.Atoi(rawValue)
 	if err != nil {
@@ -32,7 +31,7 @@ func GetQueryParamToInt(c *gin.Context, paramName string, defaultValue int) int 
 
 // Retrieves a url query parameter and parses it to an int64 if it is set.
 // If it is not set it will return the input default value.
-func GetQueryParamToInt64(c *gin.Context, paramName string, defaultValue int64) int64 {
+func GetQueryParamToInt64(c interfaces.APIContext, paramName string, defaultValue int64) int64 {
 	rawValue := c.DefaultQuery(paramName, strconv.FormatInt(defaultValue, 10))
 	value, err := strconv.ParseInt(rawValue, 10, 64)
 	if err != nil {
@@ -50,7 +49,7 @@ func GetQueryParamToInt64(c *gin.Context, paramName string, defaultValue int64) 
 
 // If a query parameter is supposed to be an array of values delimited by
 // some separator, then this will split them out to that array.
-func GetQueryParamToStringArray(c *gin.Context, paramName string, defaultValue string) []string {
+func GetQueryParamToStringArray(c interfaces.APIContext, paramName string, defaultValue string) []string {
 	rawValue := c.DefaultQuery(paramName, defaultValue)
 	values := strings.Split(rawValue, paths.ArraySeparator)
 	if strings.TrimSpace(values[0]) == "" {

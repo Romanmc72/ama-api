@@ -3,7 +3,6 @@ package endpoints
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -12,7 +11,7 @@ import (
 )
 
 // GetQuestionById(c *gin.Context) will get one question using its unique id.
-func GetQuestionById(c *gin.Context, db interfaces.QuestionReader) {
+func GetQuestionById(c interfaces.APIContext, db interfaces.QuestionReader) {
 	id := c.Param("id")
 	questionFetched, err := db.ReadQuestion(id)
 	if err != nil {

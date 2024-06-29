@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-
 	"ama/api/application"
 	"ama/api/interfaces"
 	"ama/api/logging"
@@ -21,7 +19,7 @@ const (
 )
 
 // GetQuestions(c *gin.Context) retrieves all of the questions from the database.
-func GetQuestions(c *gin.Context, db interfaces.QuestionReader) {
+func GetQuestions(c interfaces.APIContext, db interfaces.QuestionReader) {
 	logger := logging.GetLogger()
 	limit := GetQueryParamToInt(c, limitParam, defaultLimit)
 	finalId := c.DefaultQuery(finalIdParam, defaultFinalId)

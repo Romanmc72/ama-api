@@ -3,15 +3,13 @@ package endpoints
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"ama/api/application"
 	"ama/api/interfaces"
 	"ama/api/logging"
 )
 
 // PostQuestions(c *gin.Context) will create a brand new question in the database.
-func PostQuestion(c *gin.Context, db interfaces.QuestionWriter) {
+func PostQuestion(c interfaces.APIContext, db interfaces.QuestionWriter) {
 	logger := logging.GetLogger()
 	var newQuestion application.NewQuestion
 
