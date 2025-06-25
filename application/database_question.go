@@ -11,13 +11,13 @@ type DatabaseQuestion struct {
 	// question (let's say less than 5 at all times) borrowing from.
 	// https://code.build/p/firestore-many-to-many-array-contains-all-dyFZgf
 	SearchTags []string `firestore:"searchTags"`
-	Tags []string `firestore:"tags"`
+	Tags       []string `firestore:"tags"`
 }
 
 func (q *DatabaseQuestion) Question(id string) Question {
 	return Question{
-		ID: id,
+		ID:     id,
 		Prompt: q.Prompt,
-		Tags: q.Tags,
+		Tags:   q.Tags,
 	}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 // Apply server side validation to the question data prior to writing it to the database.
-func ValidateQuestion(q Question) (error) {
+func ValidateQuestion(q Question) error {
 	var errorBuilder strings.Builder
 	if strings.Join(q.Tags, "") == "" {
 		errorBuilder.WriteString(`question "tags" field is required to have at least 1 tag`)

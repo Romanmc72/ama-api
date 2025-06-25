@@ -27,23 +27,23 @@ func SortDedupeAndIgnore(options []string, illegalCharacter string) []string {
 // returned the same for an equivalent input. Duplicates cause issues with the
 // algorithm. The resulting size Y can be calculated as follows:
 //
-//  func tot(X) {
-// 		Y := 0
-// 		for i := range X {
-// 			Y = sum + C(X, i)
-// 		}
-//  }
+//	 func tot(X) {
+//			Y := 0
+//			for i := range X {
+//				Y = sum + C(X, i)
+//			}
+//	 }
 //
 // where
 //
-// 	func C(n int, k int) int
+//	func C(n int, k int) int
 //
 // is of the mathematical form:
 //
-// 	C(n,k) = n!/((n-k)!k!)
+//	C(n,k) = n!/((n-k)!k!)
 //
-// I am pretty sure the time complexity of this algorithm is O(n) which
-// I think can be simplified to O(n*n!).
+// I am pretty sure the time complexity of this algorithm is O(n!+(n-1)!+(n-2)!...+1!) which
+// I think can be simplified to O(n!).
 //
 // "tot()"" is defined above
 //
@@ -54,7 +54,7 @@ func Combine(options []string, delimiter string) []string {
 	if numberOfOptions == 0 {
 		return options
 	}
-	// pre-allocatings the array will save time/space
+	// pre-allocating the array will save time/space
 	numberOfResults, err := totalCombinations(numberOfOptions, numberOfOptions)
 	if err != nil {
 		return options
@@ -73,17 +73,17 @@ func Combine(options []string, delimiter string) []string {
 				intermediateResults[position] = []string{o}
 				position += 1
 			}
-		// The final iteration uses every item combined as a single entry
-		} else if iteration == numberOfOptions - 1 {
+			// The final iteration uses every item combined as a single entry
+		} else if iteration == numberOfOptions-1 {
 			intermediateResults[position] = options
 			position += 1
-		// Every other iteration will run through carrying a pointer to the previous
-		// run's iteration, tracking its rightmost position along with a pointer to
-		// the remaining items to combine ensuring that it grabs and adds on items
-		// to the running list in order to create all possible combinations without repeats.
+			// Every other iteration will run through carrying a pointer to the previous
+			// run's iteration, tracking its rightmost position along with a pointer to
+			// the remaining items to combine ensuring that it grabs and adds on items
+			// to the running list in order to create all possible combinations without repeats.
 		} else {
 			for _, previousSlice := range previousSlices {
-				previousSliceRightOption := previousSlice[len(previousSlice) - 1]
+				previousSliceRightOption := previousSlice[len(previousSlice)-1]
 				// The point on the previous slice we are currently iterating that
 				// represents the right most edge of the option set. If the right edge
 				// is the same index as the last element in the choices set, then we
@@ -132,7 +132,7 @@ func Combine(options []string, delimiter string) []string {
 		copy(previousSlices, intermediateResults)
 		if int(optionsThisIteration) != len(options) {
 			perIterationCombinations = int(combinationsForOneChoiceSet(
-				numberOfOptions, optionsThisIteration + 1))
+				numberOfOptions, optionsThisIteration+1))
 			intermediateResults = make([][]string, perIterationCombinations)
 		}
 		position = 0
@@ -142,9 +142,7 @@ func Combine(options []string, delimiter string) []string {
 
 // Get the number of choices for one single combination and choice set.
 func combinationsForOneChoiceSet(numberOfOptions uint, choices uint) uint {
-	return (
-		factorial(numberOfOptions) / (
-			factorial(numberOfOptions - choices) * factorial(choices)))
+	return (factorial(numberOfOptions) / (factorial(numberOfOptions-choices) * factorial(choices)))
 }
 
 // Determines the number of results that will appear in the final combination
@@ -156,7 +154,7 @@ func totalCombinations(numberOfOptions uint, choices uint) (uint, error) {
 	if choices == 1 {
 		return numberOfOptions, nil
 	}
-	lowerAmount, err := totalCombinations(numberOfOptions, choices - 1)
+	lowerAmount, err := totalCombinations(numberOfOptions, choices-1)
 	if err != nil {
 		return 0, err
 	}
@@ -169,5 +167,5 @@ func factorial(number uint) uint {
 	if number <= 0 {
 		return 1
 	}
-	return number * factorial(number - 1)
+	return number * factorial(number-1)
 }

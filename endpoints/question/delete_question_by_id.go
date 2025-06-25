@@ -1,4 +1,4 @@
-package endpoints
+package question
 
 import (
 	"fmt"
@@ -6,7 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"ama/api/application"
+	"ama/api/application/responses"
+	"ama/api/constants"
 	"ama/api/interfaces"
 	"ama/api/logging"
 )
@@ -14,12 +15,12 @@ import (
 // DeleteQuestionById(c *gin.Context) will delete one question using its id.
 func DeleteQuestionById(c interfaces.APIContext, db interfaces.QuestionDeleter) {
 	logger := logging.GetLogger()
-	id := c.Param("id")
+	id := c.Param(constants.QuestionIdPathIdentifier)
 	deleteTime, err := db.DeleteQuestion(id)
 	if err != nil {
 		c.IndentedJSON(
 			http.StatusInternalServerError,
-			application.NewError("Something went wrong trying to delete that document"),
+			responses.NewError("Something went wrong trying to delete that document"),
 		)
 		return
 	}

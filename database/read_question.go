@@ -5,12 +5,12 @@ import (
 	"google.golang.org/grpc/status"
 
 	"ama/api/application"
-	"ama/api/firestoreobjects"
+	"ama/api/constants"
 )
 
 // Retrieve a particular question from the database
 func (db *Database) ReadQuestion(id string) (application.Question, error) {
-	collection := db.client.Collection(firestoreobjects.QuestionCollection)
+	collection := db.client.Collection(constants.QuestionCollection)
 	var questionFetched application.NewQuestion
 	document, err := collection.Doc(id).Get(db.ctx)
 	if err != nil {

@@ -14,7 +14,6 @@ type QuestionConverter interface {
 	Question(questionId string) application.Question
 }
 
-
 // Writes questions to the database
 type QuestionWriter interface {
 	// Creates a question using any object that can convert itself to a question.

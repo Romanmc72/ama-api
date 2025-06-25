@@ -1,9 +1,10 @@
-package endpoints
+package question
 
 import (
 	"net/http"
 
 	"ama/api/application"
+	"ama/api/application/responses"
 	"ama/api/interfaces"
 	"ama/api/logging"
 )
@@ -14,15 +15,15 @@ func PostQuestion(c interfaces.APIContext, db interfaces.QuestionWriter) {
 	var newQuestion application.NewQuestion
 
 	if err := c.BindJSON(&newQuestion); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, application.NewError("invalid data"))
+		c.IndentedJSON(http.StatusBadRequest, responses.NewError("invalid data"))
 		logger.Error("Invalid input data provided of", "body", c.GetString("body"), "error", err)
 		return
 	}
 	question, err := db.CreateQuestion(&newQuestion)
 	if err != nil {
 		c.IndentedJSON(
-			http.StatusBadRequest,
-			application.NewError("encountered an error writing that data"),
+			http.StatusInternalServerError,
+			responses.NewError("encountered an error writing that data"),
 		)
 		logger.Error("Encountered an error writing that question", "question", err)
 		return

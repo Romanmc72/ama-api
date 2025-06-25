@@ -1,42 +1,32 @@
-package endpoints
+package question
 
 import (
 	"net/http"
-	"strings"
 
 	"ama/api/application"
+	"ama/api/application/responses"
+	"ama/api/constants"
+	"ama/api/endpoints"
 	"ama/api/interfaces"
 	"ama/api/logging"
-)
-
-const (
-	limitParam = "limit"
-	defaultLimit = 0
-	finalIdParam = "finalId"
-	defaultFinalId = ""
-	tagParam = "tags"
-	defaultTag = ""
 )
 
 // GetQuestions(c *gin.Context) retrieves all of the questions from the database.
 func GetQuestions(c interfaces.APIContext, db interfaces.QuestionReader) {
 	logger := logging.GetLogger()
-	limit := GetQueryParamToInt(c, limitParam, defaultLimit)
-	finalId := c.DefaultQuery(finalIdParam, defaultFinalId)
-	rawTags := c.DefaultQuery(tagParam, defaultTag)
-	tags := strings.Split(rawTags, application.SearchTagDelimiter)
+	limit, finalId, tags := endpoints.GetReadQuestionsParamsWithDefaults(c)
 	questions, err := db.ReadQuestions(limit, finalId, tags)
 	if err != nil {
 		logger.Error(
 			"Something went wrong getting the questions",
 			"error", err,
-			limitParam, limit,
-			finalIdParam, finalId,
-			tagParam, tags,
+			constants.LimitParam, limit,
+			constants.FinalIdParam, finalId,
+			constants.TagParam, tags,
 		)
 		c.IndentedJSON(
 			http.StatusInternalServerError,
-			application.NewError("Could not retrieve questions"),
+			responses.NewError("Could not retrieve questions"),
 		)
 		return
 	}

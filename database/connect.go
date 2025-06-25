@@ -23,7 +23,7 @@ func Connect() (Database, error) {
 	}
 	return Database{
 		client: client,
-		ctx: ctx,
+		ctx:    ctx,
 		logger: logger,
 	}, nil
 }

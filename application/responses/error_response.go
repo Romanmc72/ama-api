@@ -1,4 +1,4 @@
-package application
+package responses
 
 // A typed response object that can be used to create an error message for the
 // json responses as well as for the logger

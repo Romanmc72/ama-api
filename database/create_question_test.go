@@ -11,11 +11,11 @@ func TestInvalidCreateQuestionNoPrompt(t *testing.T) {
 	db := Database{
 		client: nil,
 		logger: logging.GetLogger(),
-		ctx: nil,
+		ctx:    nil,
 	}
 	testQ := application.NewQuestion{
 		Prompt: "    ",
-		Tags: []string{"1", "2"},
+		Tags:   []string{"1", "2"},
 	}
 	_, err := db.CreateQuestion(&testQ)
 	if err == nil {
@@ -28,11 +28,11 @@ func TestInvalidCreateQuestionNoTags(t *testing.T) {
 	db := Database{
 		client: nil,
 		logger: logging.GetLogger(),
-		ctx: nil,
+		ctx:    nil,
 	}
 	testQ := application.NewQuestion{
 		Prompt: "A question!",
-		Tags: []string{},
+		Tags:   []string{},
 	}
 	_, err := db.CreateQuestion(&testQ)
 	if err == nil {
@@ -45,11 +45,11 @@ func TestInvalidCreateQuestionDuplicateTags(t *testing.T) {
 	db := Database{
 		client: nil,
 		logger: logging.GetLogger(),
-		ctx: nil,
+		ctx:    nil,
 	}
 	testQ := application.NewQuestion{
 		Prompt: "A question!",
-		Tags: []string{"1", "2", "1"},
+		Tags:   []string{"1", "2", "1"},
 	}
 	_, err := db.CreateQuestion(&testQ)
 	if err == nil {

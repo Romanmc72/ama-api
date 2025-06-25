@@ -20,6 +20,6 @@ type Database struct {
 }
 
 // The close function to be deferred
-func (db *Database) Close() (error) {
+func (db *Database) Close() error {
 	return db.client.Close()
 }

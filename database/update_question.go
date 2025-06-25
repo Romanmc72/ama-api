@@ -2,7 +2,7 @@ package database
 
 import (
 	"ama/api/application"
-	"ama/api/firestoreobjects"
+	"ama/api/constants"
 	"ama/api/interfaces"
 )
 
@@ -14,7 +14,7 @@ func (db *Database) UpdateQuestion(id string, questionData interfaces.QuestionCo
 		return application.Question{}, err
 	}
 	writeResult, err := db.client.
-		Collection(firestoreobjects.QuestionCollection).
+		Collection(constants.QuestionCollection).
 		Doc(question.ID).
 		Set(db.ctx, question)
 	if err != nil {
