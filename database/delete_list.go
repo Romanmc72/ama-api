@@ -10,9 +10,9 @@ import (
 )
 
 // Erase a list from a user in the database
-func (db *Database) DeleteList(userId string, listName string) error {
+func (db *Database) DeleteList(userId string, listId string) error {
 	userDocRef := db.client.Collection(constants.UserCollection).Doc(userId)
-	listCollection := userDocRef.Collection(listName)
+	listCollection := userDocRef.Collection(listId)
 	err := db.deleteCollection(listCollection, 500)
 	if err != nil {
 		return err
@@ -32,11 +32,11 @@ func (db *Database) DeleteList(userId string, listName string) error {
 			return err
 		}
 		newList := []list.List{}
-		for _, list := range user.Lists {
-			if list.Name == listName {
+		for _, l := range user.Lists {
+			if l.ID == listId {
 				continue
 			}
-			newList = append(newList, list)
+			newList = append(newList, l)
 		}
 		return tx.Set(
 			userDocRef,

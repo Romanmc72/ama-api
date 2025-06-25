@@ -10,9 +10,9 @@ type GetUserListByIdResponse struct {
 	Questions []application.Question `json:"questions"`
 }
 
-func NewGetUserListByIdResponse(list list.List, questions []application.Question) GetUserListByIdResponse {
+func NewGetUserListByIdResponse(l list.List, q []application.Question) GetUserListByIdResponse {
 	return GetUserListByIdResponse{
-		List:      list,
-		Questions: questions,
+		List:      l,
+		Questions: q,
 	}
 }

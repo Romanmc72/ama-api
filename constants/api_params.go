@@ -13,4 +13,7 @@ const (
 	TagParam = "tags"
 	// The default tag parameter value (no tag filters).
 	DefaultTag = ""
+	// If you want a random question from a list, set this to "true".
+	// Passing in a finalId will override the default random behavior.
+	RandomParam = "random"
 )

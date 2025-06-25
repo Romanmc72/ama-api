@@ -13,7 +13,7 @@ func (db *Database) DeleteUser(id string) (time.Time, error) {
 		return time.Now(), err
 	}
 	for _, list := range user.Lists {
-		err = db.DeleteList(id, list.Name)
+		err = db.DeleteList(id, list.ID)
 		if err != nil {
 			db.logger.Error("Error deleting list", "user", id, "list", list.Name, "error", err)
 			return time.Now(), err
