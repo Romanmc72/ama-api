@@ -1,10 +1,7 @@
 package question
 
 import (
-	"fmt"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 
 	"ama/api/application/responses"
 	"ama/api/constants"
@@ -30,12 +27,9 @@ func DeleteQuestionById(c interfaces.APIContext, db interfaces.QuestionDeleter) 
 	)
 	c.IndentedJSON(
 		http.StatusOK,
-		gin.H{
-			"message": fmt.Sprintf(
-				"Deleted %s at %s",
-				id,
-				deleteTime.String(),
-			),
+		responses.SuccessResponse{
+			Success: true,
+			Time: deleteTime.Unix(),
 		},
 	)
 }
