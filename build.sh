@@ -59,6 +59,13 @@ _cp_gen() {
 run() {
 	db &
 	DATABASE_PROCESS=$!
+	sleep 1
+	ps -p $DATABASE_PROCESS > /dev/null
+	if [[ "$?" != "0" ]]
+	then
+		echo 'Failed to start database emulator.'
+		exit 1
+	fi
 	_kill_db() {
 		_echo_green 'Killing database...'
 		kill -INT $DATABASE_PROCESS

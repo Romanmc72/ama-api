@@ -9,6 +9,8 @@ import (
 type BaseUser struct {
 	// The user's username.
 	Name string `json:"name" firestore:"name"`
+	// The user's username.
+	Email string `json:"email" firestore:"email" binding:"required"`
 	// The user's subscription tier. One of "free" | "lite" | "premium"
 	Tier string `json:"tier" firestore:"tier" binding:"required"`
 	// The user's subscription information.

@@ -30,7 +30,7 @@ question_tests() {
       --silent \
       -X POST \
       -H 'Content-Type: application/json' \
-      -d '{"prompt": "second test question", "tags": ["test", "another test", "'$i'"]}' \
+      -d '{"prompt": "test '$i' question", "tags": ["test", "another test", "'$i'"]}' \
       localhost:$PORT/question | jq
   done
   echo "Fetching all question"
@@ -53,6 +53,7 @@ user_tests() {
     -H 'Content-Type: application/json' \
     -d '{
       "name": "test",
+      "email": "test@test.com",
       "tier": "free",
       "subscription": {
         "payCadence": "monthly",
@@ -108,7 +109,7 @@ main() {
   echo 'Running user tests...'
   user_tests
   echo 'All user tests passed!'
-  delete_all_questions
+  # delete_all_questions
   echo 'Done!'
 }
 

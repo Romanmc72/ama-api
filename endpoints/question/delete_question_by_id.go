@@ -29,7 +29,7 @@ func DeleteQuestionById(c interfaces.APIContext, db interfaces.QuestionDeleter) 
 		http.StatusOK,
 		responses.SuccessResponse{
 			Success: true,
-			Time: deleteTime.Unix(),
+			Time:    deleteTime.Unix(),
 		},
 	)
 }
