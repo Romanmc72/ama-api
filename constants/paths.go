@@ -13,7 +13,7 @@ const (
 	QuestionByIdPath = QuestionBasePath + "/:" + QuestionIdPathIdentifier
 )
 
-const (	
+const (
 	// The root user endpoint.
 	UserBasePath = "/user"
 	// For interacting with a user profile.

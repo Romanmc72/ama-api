@@ -2,5 +2,5 @@ package constants
 
 const (
 	AuthorizationHeader = "Authorization"
-	FirebaseUIDHeader = "Firebase-UID"
+	FirebaseUIDHeader   = "Firebase-UID"
 )

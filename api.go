@@ -80,7 +80,7 @@ func main() {
 	)
 
 	validatedUserGroup := authorizedGroup.Group(constants.UserByIdPath)
-	validatedUserGroup.Use(func(c *gin.Context) { auth.VerifyUserID(c, logger)})
+	validatedUserGroup.Use(func(c *gin.Context) { auth.VerifyUserID(c, logger) })
 
 	// Validated user endpoints
 	validatedUserGroup.DELETE(

@@ -20,7 +20,7 @@ type MockAPIContext struct {
 	ResponseData interface{}
 
 	validate *validator.Validate
-	headers map[string]string
+	headers  map[string]string
 }
 
 // NewMockAPIContext creates a new instance of MockAPIContext
