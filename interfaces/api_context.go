@@ -9,4 +9,5 @@ type APIContext interface {
 	IndentedJSON(code int, obj any)
 	Param(key string) string
 	GetQueryArray(key string) ([]string, bool)
+	GetHeader(key string) (string)
 }

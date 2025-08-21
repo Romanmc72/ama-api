@@ -1,7 +1,9 @@
 // The paths that represent various API endpoints.
 package constants
 
-// Paths defining API routes.
+const NoPath = ""
+const BasePath = "/"
+
 const (
 	// The path that allows for a health check ping.
 	PingPath = "/ping"
@@ -9,12 +11,18 @@ const (
 	QuestionBasePath = "/question"
 	// For working with a specific question.
 	QuestionByIdPath = QuestionBasePath + "/:" + QuestionIdPathIdentifier
+)
+
+const (	
 	// The root user endpoint.
 	UserBasePath = "/user"
 	// For interacting with a user profile.
 	UserByIdPath = UserBasePath + "/:" + UserIdPathIdentifier
 	// The root user question list endpoint.
-	UserListPath = UserByIdPath + "/list"
+	// NOTE: This is not chained to the user by ID path because the user ID is
+	// passed in via the route grouping and is automatically chained in the api
+	// definition as a result.
+	UserListPath = "/list"
 	// For working with a specific user question list.
 	UserListByIdPath = UserListPath + "/:" + ListIdPathIdentifier
 	// For working with a questions in a user question list.

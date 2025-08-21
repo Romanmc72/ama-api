@@ -72,6 +72,7 @@ run() {
 	}
 	trap _kill_db SIGINT
 	_cp_gen
+	export FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099
 	export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 && \
 	export PROJECT_ID=ama-dev && \
 	export GO_LOG=debug && \

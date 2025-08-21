@@ -3,12 +3,16 @@
 set -euo pipefail
 
 PORT=8088
+# TODO: Get the machine to machine auth to work with a
+#       custom claim for a role to use the question/admin role here
+ID_TOKEN='TODO: Get this to work with the Firebase emulator'
 
 question_tests() {
   question_id=$(curl \
     --silent \
     -X POST \
     -H 'Content-Type: application/json' \
+    -H "Authorization: Bearer ${ID_TOKEN}" \
     -d '{"prompt": "test question", "tags": ["test"]}' \
     localhost:$PORT/question | jq -r '.id')
   echo "Created question with id ${question_id}"
@@ -30,6 +34,7 @@ question_tests() {
       --silent \
       -X POST \
       -H 'Content-Type: application/json' \
+      -H "Authorization: Bearer ${ID_TOKEN}" \
       -d '{"prompt": "test '$i' question", "tags": ["test", "another test", "'$i'"]}' \
       localhost:$PORT/question | jq
   done
@@ -43,7 +48,10 @@ delete_all_questions() {
   echo "Deleting all questions"
   for each_question in $(curl --silent "localhost:$PORT/question?tags=test&limit=100" | jq -r '.[] | .id')
   do
-    curl --silent -X DELETE "localhost:$PORT/question/${each_question}" | jq
+    curl --silent \
+      -X DELETE \
+      -H "Authorization: Bearer ${ID_TOKEN}" \
+      "localhost:$PORT/question/${each_question}" | jq
   done
 }
 
@@ -51,10 +59,12 @@ user_tests() {
   echo 'Creating a user'
   USER_ID=$(curl --silent -X POST \
     -H 'Content-Type: application/json' \
+    -H "Authorization: Bearer ${ID_TOKEN}" \
     -d '{
       "name": "test",
       "email": "test@test.com",
       "tier": "free",
+      "firebaseId": "'$(uuidgen)'",
       "subscription": {
         "payCadence": "monthly",
         "renewalDate": "2025-06-23T07:31:37.079771Z"
@@ -70,7 +80,7 @@ user_tests() {
       "lists": []
     }' \
     localhost:$PORT/user | jq -r '.id')
-  list_id=$(curl --silent localhost:$PORT/user/$USER_ID | jq -r '.lists[0].id')
+  list_id=$(curl --silent -H "Authorization: Bearer ${ID_TOKEN}" localhost:$PORT/user/$USER_ID | jq -r '.lists[0].id')
   list_tests() {
     echo 'Testing user lists'
     for i in {0..5}
@@ -80,25 +90,26 @@ user_tests() {
       curl \
         --silent \
         -X POST \
+        -H "Authorization: Bearer ${ID_TOKEN}" \
         "localhost:$PORT/user/$USER_ID/list/$list_id/question/$question_id" \
         | jq
     done
     echo 'Fetching questions from list and removing them'
-    for each_question in $(curl --silent "localhost:$PORT/user/$USER_ID/list/$list_id?limit=10" | jq -r '.questions[] | .id')
+    for each_question in $(curl --silent -H "Authorization: Bearer ${ID_TOKEN}" "localhost:$PORT/user/$USER_ID/list/$list_id?limit=10" | jq -r '.questions[] | .id')
     do
       echo "Removing question $each_question from list $list_id"
-      curl --silent -X DELETE "localhost:$PORT/user/$USER_ID/list/$list_id/question/$each_question" | jq
+      curl --silent -X DELETE -H "Authorization: Bearer ${ID_TOKEN}" "localhost:$PORT/user/$USER_ID/list/$list_id/question/$each_question" | jq
     done
   }
   echo 'Testing user lists...'
   list_tests
   echo 'List tests passed!'
   echo 'Deleting user'
-  curl --silent -X DELETE "localhost:$PORT/user/$USER_ID" | jq
+  curl --silent -X DELETE -H "Authorization: Bearer ${ID_TOKEN}" "localhost:$PORT/user/$USER_ID" | jq
 }
 
 get_random_question_id() {
-  echo -n $(curl --silent "localhost:$PORT/question?limit=1&tags=test&random=true" | jq -r '.[0].id')
+  echo -n $(curl --silent -H "Authorization: Bearer ${ID_TOKEN}" "localhost:$PORT/question?limit=1&tags=test&random=true" | jq -r '.[0].id')
 }
 
 # Creates reads updates and deletes data through the API as a series of tests

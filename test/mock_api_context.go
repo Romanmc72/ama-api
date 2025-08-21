@@ -20,6 +20,7 @@ type MockAPIContext struct {
 	ResponseData interface{}
 
 	validate *validator.Validate
+	headers map[string]string
 }
 
 // NewMockAPIContext creates a new instance of MockAPIContext
@@ -28,6 +29,7 @@ func NewMockAPIContext() *MockAPIContext {
 		Params:      make(map[string]string),
 		QueryValues: make(map[string][]string),
 		validate:    validator.New(),
+		headers:     make(map[string]string),
 	}
 }
 
@@ -90,4 +92,12 @@ func (m *MockAPIContext) SetQueryValue(key string, values []string) {
 // SetInputJSON sets the JSON data to be bound
 func (m *MockAPIContext) SetInputJSON(data []byte) {
 	m.InputJSON = data
+}
+
+func (m *MockAPIContext) GetHeader(key string) string {
+	return m.headers[key]
+}
+
+func (m *MockAPIContext) Header(key string, value string) {
+	m.headers[key] = value
 }

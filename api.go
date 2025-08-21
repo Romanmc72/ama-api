@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"ama/api/auth"
 	"ama/api/constants"
 	"ama/api/database"
 	"ama/api/endpoints/list"
@@ -25,85 +26,104 @@ func main() {
 
 	logger := logging.GetLogger()
 	router := gin.Default()
+	jwtVerifier, err := auth.NewAuthClient()
+	if err != nil {
+		logger.Error("Could not connect to Firebase", "error", err)
+	}
 	db, err := database.Connect()
 	if err != nil {
 		logger.Error("Could not connect to the database", "error", err)
 	}
 	defer db.Close()
+
 	// Health check endpoint
 	router.GET(
 		constants.PingPath,
 		func(c *gin.Context) { c.IndentedJSON(http.StatusOK, map[string]string{"ping": "pong"}) },
 	)
 
+	// Routes requiring the authorization header to be set
+	authorizedGroup := router.Group("/")
+	// TODO: Something is wrong here and the token is not parsing correctly
+	authorizedGroup.Use(func(c *gin.Context) { auth.VerifyToken(c, jwtVerifier, logger) })
+
 	// Question endpoints
-	router.GET(
+	authorizedGroup.GET(
 		constants.QuestionBasePath,
 		func(c *gin.Context) { question.GetQuestions(c, &db) },
 	)
-	router.POST(
-		constants.QuestionBasePath,
-		func(c *gin.Context) { question.PostQuestion(c, &db) },
-	)
-	router.GET(
+	authorizedGroup.GET(
 		constants.QuestionByIdPath,
 		func(c *gin.Context) { question.GetQuestionById(c, &db) },
 	)
-	router.DELETE(
+
+	// admin only question endpoints
+	adminOnlyGroup := authorizedGroup.Group(constants.QuestionBasePath)
+	adminOnlyGroup.Use(func(c *gin.Context) { auth.VerifyRequiredScope(c, logger, constants.GetAdminScopes()) })
+	adminOnlyGroup.POST(
+		constants.QuestionBasePath,
+		func(c *gin.Context) { question.PostQuestion(c, &db) },
+	)
+	adminOnlyGroup.DELETE(
 		constants.QuestionByIdPath,
 		func(c *gin.Context) { question.DeleteQuestionById(c, &db) },
 	)
-	router.PUT(
+	adminOnlyGroup.PUT(
 		constants.QuestionByIdPath,
 		func(c *gin.Context) { question.PutQuestionById(c, &db) },
 	)
 
-	// User endpoints
-	router.DELETE(
-		constants.UserByIdPath,
-		func(c *gin.Context) { user.DeleteUserById(c, &db) },
-	)
-	router.GET(
-		constants.UserByIdPath,
-		func(c *gin.Context) { user.GetUserByUserId(c, &db) },
-	)
-	router.PUT(
-		constants.UserByIdPath,
-		func(c *gin.Context) { user.PutUserByUserId(c, &db) },
-	)
-	router.POST(
+	// Create user endpoint (not a part of the user-validated group)
+	authorizedGroup.POST(
 		constants.UserBasePath,
 		func(c *gin.Context) { user.PostUser(c, &db) },
 	)
 
+	validatedUserGroup := authorizedGroup.Group(constants.UserByIdPath)
+	validatedUserGroup.Use(func(c *gin.Context) { auth.VerifyUserID(c, logger)})
+
+	// Validated user endpoints
+	validatedUserGroup.DELETE(
+		constants.NoPath,
+		func(c *gin.Context) { user.DeleteUserById(c, &db) },
+	)
+	validatedUserGroup.GET(
+		constants.NoPath,
+		func(c *gin.Context) { user.GetUserByUserId(c, &db) },
+	)
+	validatedUserGroup.PUT(
+		constants.NoPath,
+		func(c *gin.Context) { user.PutUserByUserId(c, &db) },
+	)
+
 	// User list endpoints
-	router.GET(
+	validatedUserGroup.GET(
 		constants.UserListPath,
 		func(c *gin.Context) { list.GetUserLists(c, &db) },
 	)
-	router.POST(
+	validatedUserGroup.POST(
 		constants.UserListPath,
 		func(c *gin.Context) { list.PostUserList(c, &db) },
 	)
-	router.GET(
+	validatedUserGroup.GET(
 		constants.UserListByIdPath,
 		func(c *gin.Context) { list.GetUserListById(c, &db) },
 	)
-	router.DELETE(
+	validatedUserGroup.DELETE(
 		constants.UserListByIdPath,
 		func(c *gin.Context) { list.DeleteUserListByID(c, &db) },
 	)
-	router.PUT(
+	validatedUserGroup.PUT(
 		constants.UserListByIdPath,
 		func(c *gin.Context) { list.PutUserListById(c, &db) },
 	)
 
 	// User list question endpoints
-	router.POST(
+	validatedUserGroup.POST(
 		constants.UserListQuestionByIdPath,
 		func(c *gin.Context) { listQuestion.PostQuestionToList(c, &db) },
 	)
-	router.DELETE(
+	validatedUserGroup.DELETE(
 		constants.UserListQuestionByIdPath,
 		func(c *gin.Context) { listQuestion.DeleteQuestionFromList(c, &db) },
 	)

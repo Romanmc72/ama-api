@@ -7,6 +7,8 @@ import (
 // The base user object, without an ID. Can be used for various implementations
 // of the user without duplicating struct types or creating import cycles.
 type BaseUser struct {
+	// The unique user identifier from firebase.
+	FirebaseID string `json:"firebaseId" firestore:"firebaseId" binding:"required"`
 	// The user's username.
 	Name string `json:"name" firestore:"name"`
 	// The user's username.
