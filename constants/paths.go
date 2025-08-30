@@ -8,7 +8,7 @@ const (
 	// The path that allows for a health check ping.
 	PingPath = "/ping"
 	// This is the base API endpoint off of which all other question endpoints will listen.
-	QuestionBasePath = "/question"
+	QuestionBasePath      = "/question"
 	QuestionIdPathSegment = "/:" + QuestionIdPathIdentifier
 	// For working with a specific question.
 	QuestionByIdPath = QuestionBasePath + QuestionIdPathSegment

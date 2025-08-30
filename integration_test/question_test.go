@@ -18,9 +18,9 @@ import (
 )
 
 type returnedToken struct {
-	Kind string `json:"kind"`
-	IsNewUser bool `json:"isNewUser"`
-	IdToken string `json:"idToken"`
+	Kind         string `json:"kind"`
+	IsNewUser    bool   `json:"isNewUser"`
+	IdToken      string `json:"idToken"`
 	RefreshToken string `json:"refreshToken"`
 	ExpirationIn string `json:"expiresIn"`
 }
@@ -104,7 +104,7 @@ func createQuestion(i int, t string, client http.Client) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	req.Header.Set("Authorization", "Bearer " + t)
+	req.Header.Set("Authorization", "Bearer "+t)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
