@@ -61,15 +61,15 @@ func main() {
 	adminOnlyGroup := authorizedGroup.Group(constants.QuestionBasePath)
 	adminOnlyGroup.Use(func(c *gin.Context) { auth.VerifyRequiredScope(c, logger, constants.GetAdminScopes()) })
 	adminOnlyGroup.POST(
-		constants.QuestionBasePath,
+		constants.NoPath,
 		func(c *gin.Context) { question.PostQuestion(c, &db) },
 	)
 	adminOnlyGroup.DELETE(
-		constants.QuestionByIdPath,
+		constants.QuestionIdPathSegment,
 		func(c *gin.Context) { question.DeleteQuestionById(c, &db) },
 	)
 	adminOnlyGroup.PUT(
-		constants.QuestionByIdPath,
+		constants.QuestionIdPathSegment,
 		func(c *gin.Context) { question.PutQuestionById(c, &db) },
 	)
 

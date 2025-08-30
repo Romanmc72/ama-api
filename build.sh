@@ -56,6 +56,13 @@ _cp_gen() {
 	cp -r ../ama-model/gen/ama/api/gen ./gen
 }
 
+_set_env_vars() {
+	export FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099
+	export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 && \
+	export PROJECT_ID=ama-dev && \
+	export GO_LOG=debug
+}
+
 run() {
 	db &
 	DATABASE_PROCESS=$!
@@ -72,10 +79,7 @@ run() {
 	}
 	trap _kill_db SIGINT
 	_cp_gen
-	export FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099
-	export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 && \
-	export PROJECT_ID=ama-dev && \
-	export GO_LOG=debug && \
+	_set_env_vars
 	go run . -port 8088 || _kill_db
 	_echo_green 'Shut down successfully.'
 }
@@ -163,6 +167,12 @@ deploy() {
 	docker tag $IMAGE_URI $LATEST_URI
 	docker push $LATEST_URI
 	_echo_green 'Done.'
+}
+
+integ() {
+	echo 'Starting integration tests...'
+	_set_env_vars
+	go test -count=1 -tags="integration" ./...
 }
 
 ci() {

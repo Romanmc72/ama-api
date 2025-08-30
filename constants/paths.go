@@ -9,8 +9,9 @@ const (
 	PingPath = "/ping"
 	// This is the base API endpoint off of which all other question endpoints will listen.
 	QuestionBasePath = "/question"
+	QuestionIdPathSegment = "/:" + QuestionIdPathIdentifier
 	// For working with a specific question.
-	QuestionByIdPath = QuestionBasePath + "/:" + QuestionIdPathIdentifier
+	QuestionByIdPath = QuestionBasePath + QuestionIdPathSegment
 )
 
 const (

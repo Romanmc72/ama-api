@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"os"
 
 	firebase "firebase.google.com/go/v4"
@@ -12,13 +11,14 @@ import (
 func NewAuthClient() (*auth.Client, error) {
 	// The Firebase Admin SDK automatically detects the FIREBASE_AUTH_EMULATOR_HOST
 	// environment variable and connects to the emulator.
+	var config *firebase.Config
 	projectId := os.Getenv("PROJECT_ID")
-	if projectId == "" {
-		return nil, errors.New("PROJECT_ID is not set")
+	if projectId != "" {
+		config = &firebase.Config{
+			ProjectID: projectId,
+		}
 	}
-	app, err := firebase.NewApp(context.Background(), &firebase.Config{
-		ProjectID: projectId,
-	})
+	app, err := firebase.NewApp(context.Background(), config)
 	if err != nil {
 		return nil, err
 	}

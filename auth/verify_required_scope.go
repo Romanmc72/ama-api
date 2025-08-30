@@ -9,20 +9,20 @@ import (
 	"ama/api/constants"
 )
 
-func VerifyRequiredScope(c *gin.Context, logger *slog.Logger, requiredScopes map[string]string) {
+func VerifyRequiredScope(c *gin.Context, logger *slog.Logger, requiredScopes map[string]any) {
 	claimsValue, exists := c.Get(constants.AuthTokenClaimsContextKey)
 	if !exists {
 		logger.Error("No claims found in context")
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Missing required claims"})
 		return
 	}
-	claims, ok := claimsValue.(map[string]interface{})
+	claims, ok := claimsValue.(map[string]any)
 	if !ok {
 		logger.Error("Claims are not in the expected format", "claims", claimsValue)
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Invalid claims format"})
 		return
 	}
-	missingScopes := map[string]string{}
+	missingScopes := map[string]any{}
 	for scope, requiredValue := range requiredScopes {
 		value, exists := claims[scope]
 		if !exists || value != requiredValue {

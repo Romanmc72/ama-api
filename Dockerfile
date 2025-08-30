@@ -1,4 +1,4 @@
-FROM golang:1.22.7-alpine3.20 AS build-stage
+FROM golang:1.25.0-alpine3.22 AS build-stage
 
 RUN mkdir -p /usr/local/ama
 WORKDIR /usr/local/ama
@@ -8,7 +8,7 @@ RUN go get .
 RUN go build .
 
 ## STAGE: 2 ##
-FROM alpine:3.20.3
+FROM alpine:3.22.1
 LABEL maintainer="Roman Czerwinski romanczerwinski@r0m4n.com"
 
 RUN addgroup ama \
