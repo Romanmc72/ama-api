@@ -39,7 +39,7 @@ type createUserRequest struct {
 	ReturnSecureToken bool   `json:"returnSecureToken"`
 }
 
-func getUserAuthToken(httpClient *http.Client, email string, password, string) (string, error) {
+func getUserAuthToken(httpClient *http.Client, email string, password string) (string, error) {
 	reqBody := createUserRequest{
 		Email:             email,
 		Password:          password,

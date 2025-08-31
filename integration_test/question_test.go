@@ -287,7 +287,7 @@ var testQuestions = []string{
 	"We alternate sharing something we'd consider a positive characteristic of each other. Share a total of five items.",
 	"How close and warm is your family? Do you feel your childhood was happier than most other people's?",
 	"How do you feel about your relationship with your mother?",
-	"Make three true “we” statements each. For instance, “We are both in this room feeling ... “",
+	`Make three true "we" statements for each person. For instance, "We are both in this room feeling ... "`,
 	"Complete this sentence: “I wish I had someone with whom I could share ... “",
 	"If you were going to become a close friend with me, please share what would be important for me to know.",
 	"Tell your me what you like about me; be very honest this time, saying things that you might not say to someone you've just met. ",
