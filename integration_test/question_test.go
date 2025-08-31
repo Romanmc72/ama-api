@@ -16,6 +16,7 @@ import (
 	"ama/api/auth"
 	"ama/api/constants"
 )
+
 func TestQuestion(t *testing.T) {
 	questionsToCreate := len(testQuestions)
 	client := &http.Client{}

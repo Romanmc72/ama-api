@@ -134,7 +134,7 @@ func createUser(idToken string, httpClient *http.Client, email string, name stri
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", idToken))
 	resp, err := httpClient.Do(req)
-  if err != nil {
+	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
