@@ -3,9 +3,9 @@ package database
 import (
 	"ama/api/application/list"
 	"ama/api/constants"
+	"ama/api/interfaces"
 	"errors"
 
-	"cloud.google.com/go/firestore"
 	"github.com/google/uuid"
 	"google.golang.org/api/iterator"
 )
@@ -65,8 +65,8 @@ func (db *Database) CreateList(userId string, l list.List) error {
 			"userId", userId,
 		)
 	}
-	for _, l := range user.Lists {
-		if l.ID == l.ID {
+	for _, eachList := range user.Lists {
+		if l.ID == eachList.ID {
 			db.logger.Debug(
 				"list already exists on user record",
 				"listId", l.ID,
@@ -79,7 +79,7 @@ func (db *Database) CreateList(userId string, l list.List) error {
 	return db.UpdateUser(user)
 }
 
-func (db *Database) checkIfListExists(userDocRef *firestore.DocumentRef, listId string) (bool, error) {
+func (db *Database) checkIfListExists(userDocRef interfaces.DocumentRef, listId string) (bool, error) {
 	iter := userDocRef.
 		Collection(listId).
 		Limit(1).

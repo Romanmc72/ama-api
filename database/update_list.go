@@ -18,7 +18,7 @@ func (db *Database) UpdateList(userId string, updatedList list.List) error {
 	db.logger.Debug("Updating list", "user", userId, "list", updatedList.ID)
 	return db.client.RunTransaction(db.ctx, func(ctx context.Context, tx *firestore.Transaction) error {
 		userDocRef := db.client.Collection(constants.UserCollection).Doc(userId)
-		userDoc, err := tx.Get(userDocRef)
+		userDoc, err := tx.Get(userDocRef.Ref())
 		if err != nil {
 			db.logger.Error("Error getting user", "error", err, "user", userId)
 			return err
@@ -39,6 +39,6 @@ func (db *Database) UpdateList(userId string, updatedList list.List) error {
 		if existingList == nil {
 			return errors.New("list not for user found")
 		}
-		return tx.Set(userDocRef, user)
+		return tx.Set(userDocRef.Ref(), user)
 	})
 }

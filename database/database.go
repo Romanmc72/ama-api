@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"cloud.google.com/go/firestore"
+	"ama/api/interfaces"
 )
 
 // Abstracts the interactions of the database implementation details away from
@@ -12,7 +12,8 @@ import (
 // all of the details behind interacting with the database.
 type Database struct {
 	// the firestore client that interacts directly with google cloud firestore
-	client *firestore.Client
+	// client *firestore.Client
+	client interfaces.DatabaseClient
 	// The context object from the application
 	ctx context.Context
 	// The instantiated logging client

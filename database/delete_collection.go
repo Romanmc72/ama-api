@@ -1,14 +1,15 @@
 package database
 
 import (
-	"cloud.google.com/go/firestore"
+	"ama/api/interfaces"
+
 	"google.golang.org/api/iterator"
 )
 
 // Delete an entire collection of data in the firestore database.
 // This could take a while and is done in batches.
-func (db *Database) deleteCollection(collectionRef *firestore.CollectionRef, batchSize int) error {
-	db.logger.Debug("delete collection", "collection", collectionRef.Path, "batchSize", batchSize)
+func (db *Database) deleteCollection(collectionRef interfaces.CollectionRef, batchSize int) error {
+	db.logger.Debug("delete collection", "collection", collectionRef.Path(), "batchSize", batchSize)
 	if batchSize > 500 {
 		db.logger.Warn("batch size too large, setting to 500", "batchSize", batchSize)
 		batchSize = 500
@@ -33,7 +34,7 @@ func (db *Database) deleteCollection(collectionRef *firestore.CollectionRef, bat
 				return err
 			}
 
-			_, err = bulkWriter.Delete(doc.Ref)
+			_, err = bulkWriter.Delete(doc.Ref())
 			if err != nil {
 				db.logger.Error("error deleting document in collection deletion", "totalDeleted", totalDeleted, "error", err)
 				return err

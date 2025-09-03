@@ -23,7 +23,7 @@ func (db *Database) DeleteList(userId string, listId string) error {
 	// race conditions.
 	var user application.User
 	return db.client.RunTransaction(db.ctx, func(ctx context.Context, tx *firestore.Transaction) error {
-		document, err := tx.Get(userDocRef)
+		document, err := tx.Get(userDocRef.Ref())
 		if err != nil {
 			return err
 		}
@@ -39,7 +39,7 @@ func (db *Database) DeleteList(userId string, listId string) error {
 			newList = append(newList, l)
 		}
 		return tx.Set(
-			userDocRef,
+			userDocRef.Ref(),
 			map[string][]list.List{"lists": newList},
 			firestore.MergeAll,
 		)

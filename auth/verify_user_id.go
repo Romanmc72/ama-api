@@ -7,9 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"ama/api/constants"
+	"ama/api/interfaces"
 )
 
-func VerifyUserID(c *gin.Context, logger *slog.Logger) {
+func VerifyUserID(c interfaces.APIContext, logger *slog.Logger) {
 	tokenId := c.GetString(constants.AuthTokenUserIdContextKey)
 	userId := c.Param(constants.UserIdPathIdentifier)
 	if tokenId != userId {

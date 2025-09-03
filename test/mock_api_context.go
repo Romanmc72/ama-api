@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -21,6 +22,7 @@ type MockAPIContext struct {
 
 	validate *validator.Validate
 	headers  map[string]string
+	values   map[string]any
 }
 
 // NewMockAPIContext creates a new instance of MockAPIContext
@@ -30,6 +32,7 @@ func NewMockAPIContext() *MockAPIContext {
 		QueryValues: make(map[string][]string),
 		validate:    validator.New(),
 		headers:     make(map[string]string),
+		values:      make(map[string]any),
 	}
 }
 
@@ -54,8 +57,11 @@ func (m *MockAPIContext) DefaultQuery(key string, defaultValue string) string {
 
 // GetString implements the GetString method of APIContext
 func (m *MockAPIContext) GetString(key string) string {
-	if values, exists := m.QueryValues[key]; exists && len(values) > 0 {
-		return values[0]
+	if v, exists := m.values[key]; exists && v != "" {
+		s, ok := v.(string)
+		if ok {
+			return s
+		}
 	}
 	return ""
 }
@@ -100,4 +106,36 @@ func (m *MockAPIContext) GetHeader(key string) string {
 
 func (m *MockAPIContext) Header(key string, value string) {
 	m.headers[key] = value
+}
+
+func (m *MockAPIContext) Get(key string) (value any, exists bool) {
+	v, ok := m.values[key]
+	return v, ok
+}
+
+func (m *MockAPIContext) Set(key string, value any) {
+	m.values[key] = value
+}
+
+func (m *MockAPIContext) AbortWithStatusJSON(code int, jsonObj any) {
+	m.ResponseCode = code
+	m.ResponseData = jsonObj
+}
+
+func (m *MockAPIContext) Next() {}
+
+func (m *MockAPIContext) Deadline() (deadline time.Time, ok bool) {
+	return time.Time{}, false
+}
+
+func (m *MockAPIContext) Done() <-chan struct{} {
+	return nil
+}
+
+func (m *MockAPIContext) Err() error {
+	return nil
+}
+
+func (m *MockAPIContext) Value(key any) any {
+	return m.values[key.(string)]
 }

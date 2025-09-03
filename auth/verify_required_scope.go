@@ -7,11 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"ama/api/constants"
+	"ama/api/interfaces"
 )
 
-func VerifyRequiredScope(c *gin.Context, logger *slog.Logger, requiredScopes map[string]any) {
+func VerifyRequiredScope(c interfaces.APIContext, logger *slog.Logger, requiredScopes map[string]any) {
+	if len(requiredScopes) == 0 {
+		// If there are no required scopes, allow access
+		c.Next()
+		return
+	}
 	claimsValue, exists := c.Get(constants.AuthTokenClaimsContextKey)
-	if !exists {
+	if !exists && len(requiredScopes) > 0 {
 		logger.Error("No claims found in context")
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Missing required claims"})
 		return

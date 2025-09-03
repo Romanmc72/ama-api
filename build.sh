@@ -94,7 +94,7 @@ test() {
 	go test -v -coverprofile="$COVERAGE_FILE.tmp" ./... | grep -v "gen/"
 }
 
-coverage() {
+cover() {
 	test
 	cat "$COVERAGE_FILE.tmp" | grep -v "gen/" > $COVERAGE_FILE
 	go tool cover -html=$COVERAGE_FILE

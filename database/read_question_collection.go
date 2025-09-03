@@ -3,6 +3,7 @@ package database
 import (
 	"ama/api/application"
 	"ama/api/constants"
+	"ama/api/interfaces"
 	"strings"
 
 	"cloud.google.com/go/firestore"
@@ -10,11 +11,10 @@ import (
 )
 
 // Generically read questions from a collection of questions using the given reference to the collection
-func (db *Database) readQuestionCollection(collectionRef *firestore.CollectionRef, limit int, finalId string, tags []string) (questions []application.Question, err error) {
+func (db *Database) readQuestionCollection(collectionRef interfaces.CollectionRef, limit int, finalId string, tags []string) (questions []application.Question, err error) {
 	query := collectionRef.OrderBy(firestore.DocumentID, firestore.Asc)
 	db.logger.Debug(
 		"Read questions query params",
-		"collectionRef", collectionRef.Path,
 		"finalId", finalId,
 		"limit", limit,
 		"tags", tags,
@@ -57,7 +57,7 @@ func (db *Database) readQuestionCollection(collectionRef *firestore.CollectionRe
 			db.logger.Error("Encountered an error iterating questions", "error", err)
 		}
 		doc.DataTo(&retrievedQuestion)
-		retrievedQuestion.ID = doc.Ref.ID
+		retrievedQuestion.ID = doc.ID()
 		questions = append(questions, retrievedQuestion)
 	}
 	return questions, nil

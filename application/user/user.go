@@ -4,6 +4,17 @@ import (
 	"ama/api/application/list"
 )
 
+const (
+	FreeTier    = "free"
+	LiteTier    = "lite"
+	PremiumTier = "premium"
+)
+
+// Get the list of valid user tiers.
+func Tiers() []string {
+	return []string{FreeTier, LiteTier, PremiumTier}
+}
+
 // The base user object, without an ID. Can be used for various implementations
 // of the user without duplicating struct types or creating import cycles.
 type BaseUser struct {

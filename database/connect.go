@@ -2,10 +2,12 @@ package database
 
 import (
 	"context"
+	"log/slog"
 	"os"
 
 	"cloud.google.com/go/firestore"
 
+	"ama/api/interfaces"
 	"ama/api/logging"
 )
 
@@ -22,8 +24,17 @@ func Connect() (Database, error) {
 		return Database{}, err
 	}
 	return Database{
-		client: client,
+		client: &FirestoreClient{client: client},
 		ctx:    ctx,
 		logger: logger,
 	}, nil
+}
+
+// Bring your own everything, designed for testing with a mock client
+func ManualTestConnect(ctx context.Context, client interfaces.DatabaseClient, logger *slog.Logger) Database {
+	return Database{
+		client: client,
+		ctx:    ctx,
+		logger: logger,
+	}
 }
