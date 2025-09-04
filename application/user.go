@@ -3,6 +3,7 @@ package application
 import (
 	"ama/api/application/list"
 	"ama/api/application/user"
+	"encoding/json"
 )
 
 // TODO remove the firestore bindings from these objects if we have database objects, otherwise remove the database objects themselves
@@ -28,4 +29,12 @@ func (u User) GetList(listId string) (list.List, bool) {
 	}
 
 	return list.List{}, false
+}
+
+func (u User) String() string {
+	v, err := json.Marshal(u)
+	if err != nil {
+		return `{"error": "` + err.Error() + `"}`
+	}
+	return string(v)
 }

@@ -29,10 +29,6 @@ func (db *Database) readQuestionCollection(collectionRef interfaces.CollectionRe
 			"Got one tag to filter with",
 			"tag", tag,
 		)
-		db.logger.Debug(
-			"Got one tag to filter with",
-			"tag", tag,
-		)
 		query = query.Where("tags", "array-contains", tag)
 	} else if len(tags) > 1 {
 		db.logger.Debug(

@@ -17,11 +17,11 @@ func (db *Database) CreateQuestion(questionData interfaces.QuestionConverter) (a
 	docRef, writeResult, err := db.client.
 		Collection(constants.QuestionCollection).
 		Add(db.ctx, databaseQuestion)
-	question = questionData.Question(docRef.ID())
 	if err != nil {
 		db.logger.Error("Encountered an error writing that question", "question", err)
 		return application.Question{}, err
 	}
+	question = questionData.Question(docRef.ID())
 	db.logger.Debug("Write succeeded", "message", writeResult)
 	return question, nil
 }

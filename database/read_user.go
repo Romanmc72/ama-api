@@ -6,19 +6,17 @@ import (
 	"ama/api/constants"
 )
 
-// TODO: Write this
-func (db *Database) ReadUser(id string) (application.User, error) {
+func (db *Database) ReadUser(id string) (u application.User, err error) {
 	doc, err := db.client.Collection(constants.UserCollection).Doc(id).Get(db.ctx)
 	if err != nil {
-		return application.User{}, err
+		return u, err
 	}
 	var baseUser user.BaseUser
 	err = doc.DataTo(&baseUser)
 	if err != nil {
-		return application.User{}, err
+		return u, err
 	}
-	return application.User{
-		ID:       id,
-		BaseUser: baseUser,
-	}, nil
+	u.ID = id
+	u.BaseUser = baseUser
+	return u, nil
 }

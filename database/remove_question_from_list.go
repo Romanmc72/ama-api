@@ -2,11 +2,16 @@ package database
 
 import (
 	"ama/api/constants"
+	"errors"
 )
 
 // Given a user, a list, and a question, remove that question from the list
 func (db *Database) RemoveQuestionFromList(userId string, listId string, questionId string) error {
 	db.logger.Debug("Removing question from list", "user", userId, "list", listId, "question", questionId)
+	if userId == "" || listId == "" || questionId == "" {
+		db.logger.Error("missing required parameters", "user", userId, "list", listId, "question", questionId)
+		return errors.New("missing required parameter")
+	}
 	result, err := db.client.
 		Collection(constants.UserCollection).
 		Doc(userId).

@@ -4,6 +4,7 @@ package test
 import (
 	"ama/api/interfaces"
 	"context"
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -310,33 +311,20 @@ type MockCollectionConfig struct {
 }
 
 type MockDocumentConfig struct {
-	Data interface{}
-	ID   string
-	Err  error
+	Data              interface{}
+	ID                string
+	Err               error
+	NestedCollections map[string]MockCollectionConfig
 }
 
 // NewMockDatabase sets up a new mock database client based on a config.
 func NewMockDatabase(cfg *MockDBConfig) *MockDatabaseClient {
-	mockClient := &MockDatabaseClient{}
-	mockClient.MockCollection = func(name string) interfaces.CollectionRef {
-		collectionConfig, ok := cfg.Collections[name]
-		if !ok {
-			return &MockCollectionRef{
-				MockDoc: func(id string) interfaces.DocumentRef {
-					return &MockDocumentRef{
-						RefID: id,
-						MockGet: func(ctx context.Context) (interfaces.DocumentSnapshot, error) {
-							return nil, errors.New("document not found")
-						},
-					}
-				},
-			}
-		}
-
-		// A mock to handle query-like calls
+	// A recursive function to build out the nested structure.
+	var createMockCollection func(config MockCollectionConfig) interfaces.CollectionRef
+	createMockCollection = func(config MockCollectionConfig) interfaces.CollectionRef {
 		mockIter := &MockDocumentIterator{}
-		if len(collectionConfig.QueryDocuments) > 0 {
-			for _, docCfg := range collectionConfig.QueryDocuments {
+		if len(config.QueryDocuments) > 0 {
+			for _, docCfg := range config.QueryDocuments {
 				mockSnap := &MockDocumentSnapshot{RefID: docCfg.ID}
 				mockSnap.MockDataTo = func(v any) error {
 					if docCfg.Data != nil {
@@ -361,12 +349,12 @@ func NewMockDatabase(cfg *MockDBConfig) *MockDatabaseClient {
 				return mockIter
 			},
 			MockAdd: func(ctx context.Context, data any) (interfaces.DocumentRef, *firestore.WriteResult, error) {
-				return &MockDocumentRef{}, &firestore.WriteResult{UpdateTime: time.Now()}, collectionConfig.MockError
+				return &MockDocumentRef{}, &firestore.WriteResult{UpdateTime: time.Now()}, config.MockError
 			},
 		}
 
 		mockCollection.MockDoc = func(id string) interfaces.DocumentRef {
-			docConfig, ok := collectionConfig.Documents[id]
+			docConfig, ok := config.Documents[id]
 			if !ok {
 				return &MockDocumentRef{
 					RefID: id,
@@ -376,25 +364,53 @@ func NewMockDatabase(cfg *MockDBConfig) *MockDatabaseClient {
 				}
 			}
 			return &MockDocumentRef{
-				RefID: id,
+				RefID: docConfig.ID,
 				MockGet: func(ctx context.Context) (interfaces.DocumentSnapshot, error) {
 					return &MockDocumentSnapshot{
 						RefID: docConfig.ID,
 						MockDataTo: func(v any) error {
-							return nil
+							if docConfig.Data != nil {
+								dataBytes, err := json.Marshal(docConfig.Data)
+								if err != nil {
+									return err
+								}
+								return json.Unmarshal(dataBytes, &v)
+							}
+							return errors.New("data is nil")
 						},
 					}, docConfig.Err
 				},
 				MockSet: func(ctx context.Context, data interface{}, opts ...firestore.SetOption) (*firestore.WriteResult, error) {
+					config.Documents[docConfig.ID] = MockDocumentConfig{
+						Data:              data,
+						ID:                docConfig.ID,
+						Err:               docConfig.Err,
+						NestedCollections: docConfig.NestedCollections,
+					}
 					return &firestore.WriteResult{UpdateTime: time.Now()}, docConfig.Err
 				},
 				MockDelete: func(ctx context.Context) (*firestore.WriteResult, error) {
+					delete(config.Documents, docConfig.ID)
 					return &firestore.WriteResult{UpdateTime: time.Now()}, docConfig.Err
+				},
+				MockCollection: func(name string) interfaces.CollectionRef {
+					if nestedColConfig, ok := docConfig.NestedCollections[name]; ok {
+						return createMockCollection(nestedColConfig)
+					}
+					return &MockCollectionRef{}
 				},
 			}
 		}
-
 		return mockCollection
 	}
+
+	mockClient := &MockDatabaseClient{}
+	mockClient.MockCollection = func(name string) interfaces.CollectionRef {
+		if collectionConfig, ok := cfg.Collections[name]; ok {
+			return createMockCollection(collectionConfig)
+		}
+		return &MockCollectionRef{}
+	}
+
 	return mockClient
 }
