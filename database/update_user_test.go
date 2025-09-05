@@ -43,7 +43,7 @@ func TestUpdateUser(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID:  fixtures.UserId,
+									ID:     fixtures.UserId,
 									SetErr: errors.New("write error"),
 								},
 							},

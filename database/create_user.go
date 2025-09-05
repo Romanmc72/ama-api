@@ -38,7 +38,7 @@ func (db *Database) CreateUser(userData user.BaseUser) (user application.User, e
 	}
 	if len(userData.Lists) == 0 || !hasLikedQuestions {
 		userData.Lists = append(userData.Lists, list.List{
-			ID: db.client.NewID(),
+			ID:   db.client.NewID(),
 			Name: list.LikedQuestionsListName,
 		})
 	}

@@ -12,9 +12,9 @@ import (
 
 func TestDeleteUser(t *testing.T) {
 	logger := logging.GetLogger()
-	testCases := []struct{
-		name string
-		db database.Database
+	testCases := []struct {
+		name    string
+		db      database.Database
 		wantErr bool
 	}{
 		{
@@ -26,13 +26,13 @@ func TestDeleteUser(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
 											Documents: map[string]test.MockDocumentConfig{
 												fixtures.QuestionId: {
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidDatabaseQuestion,
 												},
 											},
@@ -71,7 +71,7 @@ func TestDeleteUser(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
@@ -98,14 +98,14 @@ func TestDeleteUser(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
-									Data: fixtures.ValidUser,
+									ID:        fixtures.UserId,
+									Data:      fixtures.ValidUser,
 									DeleteErr: errors.New("delete error"),
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
 											Documents: map[string]test.MockDocumentConfig{
 												fixtures.QuestionId: {
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidDatabaseQuestion,
 												},
 											},

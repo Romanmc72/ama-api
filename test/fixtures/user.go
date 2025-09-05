@@ -22,7 +22,7 @@ var ValidLists = []list.List{
 		Name: "List 1",
 	},
 	{
-		ID:	  NewId,
+		ID:   NewId,
 		Name: list.LikedQuestionsListName,
 	},
 }

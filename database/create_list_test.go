@@ -14,16 +14,16 @@ import (
 func TestCreateList(t *testing.T) {
 	testListName := "test list"
 	logger := logging.GetLogger()
-	testCases := []struct{
-		name string
-		l    list.List
-		userId    string
-		db database.Database
+	testCases := []struct {
+		name    string
+		l       list.List
+		userId  string
+		db      database.Database
 		wantErr bool
 	}{
 		{
-			name: "Success - Exists",
-			l: fixtures.ValidLists[0],
+			name:   "Success - Exists",
+			l:      fixtures.ValidLists[0],
 			userId: fixtures.UserId,
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -32,13 +32,13 @@ func TestCreateList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
 											QueryDocuments: []test.MockDocumentConfig{
 												{
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidDatabaseQuestion,
 												},
 											},
@@ -56,8 +56,8 @@ func TestCreateList(t *testing.T) {
 		{
 			// Theoretically impossible for the uuid4 to generate a duplicate but
 			// this gets 100% test coverage :flex:
-			name: "Success - Exists No ID Provided",
-			l: list.List{Name: testListName},
+			name:   "Success - Exists No ID Provided",
+			l:      list.List{Name: testListName},
 			userId: fixtures.UserId,
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -66,13 +66,13 @@ func TestCreateList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.NewId: {
 											QueryDocuments: []test.MockDocumentConfig{
 												{
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidDatabaseQuestion,
 												},
 											},
@@ -88,8 +88,8 @@ func TestCreateList(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Success - Does Not Exist",
-			l: list.List{ID: "fester-fiesta", Name: testListName},
+			name:   "Success - Does Not Exist",
+			l:      list.List{ID: "fester-fiesta", Name: testListName},
 			userId: fixtures.UserId,
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -98,7 +98,7 @@ func TestCreateList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 								},
 							},
@@ -110,8 +110,8 @@ func TestCreateList(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Empty userId",
-			l: list.List{Name: testListName},
+			name:   "Empty userId",
+			l:      list.List{Name: testListName},
 			userId: "   ",
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -120,7 +120,7 @@ func TestCreateList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 								},
 							},
@@ -132,8 +132,8 @@ func TestCreateList(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Read Error",
-			l: list.List{Name: testListName},
+			name:   "Read Error",
+			l:      list.List{Name: testListName},
 			userId: fixtures.UserId,
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -142,8 +142,8 @@ func TestCreateList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
-									Data: fixtures.ValidBaseUser,
+									ID:     fixtures.UserId,
+									Data:   fixtures.ValidBaseUser,
 									GetErr: errors.New("cannot read user"),
 								},
 							},
@@ -155,8 +155,8 @@ func TestCreateList(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Existence Check Error",
-			l: list.List{ID: fixtures.ListId, Name: testListName},
+			name:   "Existence Check Error",
+			l:      list.List{ID: fixtures.ListId, Name: testListName},
 			userId: fixtures.UserId,
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -165,13 +165,13 @@ func TestCreateList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
 											QueryDocuments: []test.MockDocumentConfig{
 												{
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidDatabaseQuestion,
 												},
 											},

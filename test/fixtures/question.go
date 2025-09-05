@@ -5,6 +5,7 @@ import (
 )
 
 const prompt = "How much wood would a woodchuck chuck?"
+
 var Tags = []string{"silly", "test"}
 
 var ValidNewQuestion = application.NewQuestion{

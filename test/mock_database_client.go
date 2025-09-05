@@ -297,7 +297,7 @@ func (m *MockDocumentSnapshot) Exists() bool {
 type MockDocumentIterator struct {
 	Snapshots []interfaces.DocumentSnapshot
 	Index     int
-	err 			error
+	err       error
 }
 
 func (m *MockDocumentIterator) Next() (interfaces.DocumentSnapshot, error) {
@@ -338,15 +338,14 @@ func (m *MockQuery) OrderBy(path string, direction firestore.Direction) interfac
 	return m
 }
 
-
 // --- Test Setup Helpers ---
 
 // MockDBConfig allows for easy configuration of the mock database.
 // This is the "clever" part that simplifies your tests.
 type MockDBConfig struct {
-	Collections map[string]MockCollectionConfig
+	Collections    map[string]MockCollectionConfig
 	TransacitonErr error
-	BulkWriter MockBulkWriter
+	BulkWriter     MockBulkWriter
 }
 
 type MockCollectionConfig struct {
@@ -359,9 +358,9 @@ type MockCollectionConfig struct {
 type MockDocumentConfig struct {
 	Data              interface{}
 	ID                string
-	GetErr					 	error
-	SetErr					 	error
-	DeleteErr 			 	error
+	GetErr            error
+	SetErr            error
+	DeleteErr         error
 	NestedCollections map[string]MockCollectionConfig
 }
 
@@ -426,8 +425,8 @@ func NewMockDatabase(cfg *MockDBConfig) *MockDatabaseClient {
 			var mockGetFn func(ctx context.Context) (interfaces.DocumentSnapshot, error)
 			if !ok {
 				mockGetFn = func(ctx context.Context) (interfaces.DocumentSnapshot, error) {
-						return nil, status.Error(codes.NotFound, "user not found")
-					}
+					return nil, status.Error(codes.NotFound, "user not found")
+				}
 			} else {
 				mockGetFn = func(ctx context.Context) (interfaces.DocumentSnapshot, error) {
 					return &MockDocumentSnapshot{
@@ -449,15 +448,15 @@ func NewMockDatabase(cfg *MockDBConfig) *MockDatabaseClient {
 				}
 			}
 			return &MockDocumentRef{
-				RefID: docConfig.ID,
+				RefID:   docConfig.ID,
 				MockGet: mockGetFn,
 				MockSet: func(ctx context.Context, data interface{}, opts ...firestore.SetOption) (*firestore.WriteResult, error) {
 					config.Documents[docConfig.ID] = MockDocumentConfig{
 						Data:              data,
 						ID:                docConfig.ID,
-						GetErr:						 docConfig.GetErr,
-						SetErr:						 docConfig.SetErr,
-						DeleteErr:				 docConfig.DeleteErr,
+						GetErr:            docConfig.GetErr,
+						SetErr:            docConfig.SetErr,
+						DeleteErr:         docConfig.DeleteErr,
 						NestedCollections: docConfig.NestedCollections,
 					}
 					return &firestore.WriteResult{UpdateTime: time.Now()}, docConfig.SetErr

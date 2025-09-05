@@ -18,13 +18,13 @@ func TestReadQuestions(t *testing.T) {
 		qs := make([]test.MockDocumentConfig, n)
 		for i := range n {
 			qs[i] = test.MockDocumentConfig{
-					ID: fmt.Sprintf("test-question-id-%d", i),
-					Data: application.DatabaseQuestion{
-						Prompt:     fmt.Sprintf("Test %d", i),
-						Tags:       []string{"test"},
-						SearchTags: []string{"test"},
-					},
-				}
+				ID: fmt.Sprintf("test-question-id-%d", i),
+				Data: application.DatabaseQuestion{
+					Prompt:     fmt.Sprintf("Test %d", i),
+					Tags:       []string{"test"},
+					SearchTags: []string{"test"},
+				},
+			}
 		}
 		return database.ManualTestConnect(
 			t.Context(),
@@ -32,7 +32,7 @@ func TestReadQuestions(t *testing.T) {
 				Collections: map[string]test.MockCollectionConfig{
 					constants.QuestionCollection: {
 						QueryDocuments: qs,
-						MockError: err,
+						MockError:      err,
 					},
 				},
 			}),
@@ -54,14 +54,14 @@ func TestReadQuestions(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Gets Some Questions Multiple Tag Filters",
+			name:    "Gets Some Questions Multiple Tag Filters",
 			limit:   10,
 			finalId: "abc123",
 			tags:    []string{"test", "silly"},
 			wantErr: false,
 		},
 		{
-			name: "Gets Some Questions No Tag Filters",
+			name:    "Gets Some Questions No Tag Filters",
 			limit:   10,
 			finalId: "abc123",
 			tags:    []string{},
@@ -70,14 +70,14 @@ func TestReadQuestions(t *testing.T) {
 		{
 			// This is just for adding coverage, results are still
 			// returned if the query parameters are omitted
-			name: "Gets No Questions",
+			name:    "Gets No Questions",
 			limit:   0,
 			finalId: "",
 			tags:    []string{},
 			wantErr: false,
 		},
 		{
-			name: "Iterator Error",
+			name:    "Iterator Error",
 			limit:   10,
 			finalId: "abc123",
 			tags:    []string{"test"},

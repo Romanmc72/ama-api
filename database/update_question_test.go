@@ -48,8 +48,8 @@ func TestUpdateQuestion(t *testing.T) {
 						constants.QuestionCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.QuestionId: {
-									Data: fixtures.ValidNewQuestion,
-									SetErr:  errors.New("write error"),
+									Data:   fixtures.ValidNewQuestion,
+									SetErr: errors.New("write error"),
 								},
 							},
 						},

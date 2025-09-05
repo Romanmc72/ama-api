@@ -14,9 +14,9 @@ import (
 
 func TestDeleteList(t *testing.T) {
 	logger := logging.GetLogger()
-	testCases := []struct{
-		name string
-		db database.Database
+	testCases := []struct {
+		name    string
+		db      database.Database
 		wantErr bool
 	}{
 		{
@@ -28,13 +28,13 @@ func TestDeleteList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
 											QueryDocuments: []test.MockDocumentConfig{
 												{
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidQuestion,
 												},
 											},
@@ -58,7 +58,7 @@ func TestDeleteList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
@@ -88,13 +88,13 @@ func TestDeleteList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
 											QueryDocuments: []test.MockDocumentConfig{
 												{
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidDatabaseQuestion,
 												},
 											},
@@ -119,13 +119,13 @@ func TestDeleteList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
 											QueryDocuments: []test.MockDocumentConfig{
 												{
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidQuestion,
 												},
 											},

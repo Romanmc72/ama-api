@@ -16,15 +16,15 @@ import (
 func TestPutUserById(t *testing.T) {
 	validUserBytes, _ := json.Marshal(fixtures.ValidBaseUser)
 	testCases := []struct {
-		name string
-		db interfaces.UserWriter
-		ctx *test.MockAPIContext
+		name     string
+		db       interfaces.UserWriter
+		ctx      *test.MockAPIContext
 		wantCode int
-		wantErr bool
+		wantErr  bool
 	}{
 		{
 			name: "Success",
-			db: &test.MockUserManager{},
+			db:   &test.MockUserManager{},
 			ctx: test.NewMockAPIContext(test.MockAPIContextConfig{
 				InputJSON: validUserBytes,
 				Params: map[string]string{
@@ -32,11 +32,11 @@ func TestPutUserById(t *testing.T) {
 				},
 			}),
 			wantCode: http.StatusOK,
-			wantErr: false,
+			wantErr:  false,
 		},
 		{
 			name: "Failure - Input JSON Bind Error",
-			db: &test.MockUserManager{},
+			db:   &test.MockUserManager{},
 			ctx: test.NewMockAPIContext(test.MockAPIContextConfig{
 				InputJSON: []byte(`{"firebaseId": 69, "name": {"fruit": "banana"}}`),
 				Params: map[string]string{
@@ -44,7 +44,7 @@ func TestPutUserById(t *testing.T) {
 				},
 			}),
 			wantCode: http.StatusBadRequest,
-			wantErr: true,
+			wantErr:  true,
 		},
 		{
 			name: "Failure - Internal Server Error",
@@ -60,7 +60,7 @@ func TestPutUserById(t *testing.T) {
 				},
 			}),
 			wantCode: http.StatusInternalServerError,
-			wantErr: true,
+			wantErr:  true,
 		},
 	}
 	for _, tc := range testCases {

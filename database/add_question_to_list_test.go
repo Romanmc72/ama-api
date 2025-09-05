@@ -13,18 +13,18 @@ import (
 
 func TestAddQuestionToList(t *testing.T) {
 	logger := logging.GetLogger()
-	testCases := []struct{
-		name string
-		userId string
-		listId string
+	testCases := []struct {
+		name     string
+		userId   string
+		listId   string
 		question application.Question
-		db database.Database
-		wantErr bool
+		db       database.Database
+		wantErr  bool
 	}{
 		{
-			name: "Success",
-			userId: fixtures.UserId,
-			listId: fixtures.ListId,
+			name:     "Success",
+			userId:   fixtures.UserId,
+			listId:   fixtures.ListId,
 			question: fixtures.ValidQuestion,
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -33,7 +33,7 @@ func TestAddQuestionToList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
@@ -50,9 +50,9 @@ func TestAddQuestionToList(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Invalid Input - Blank userId",
-			userId: "",
-			listId: fixtures.ListId,
+			name:     "Invalid Input - Blank userId",
+			userId:   "",
+			listId:   fixtures.ListId,
 			question: fixtures.ValidQuestion,
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -62,9 +62,9 @@ func TestAddQuestionToList(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Invalid Input - Blank listId",
-			userId: fixtures.UserId,
-			listId: "",
+			name:     "Invalid Input - Blank listId",
+			userId:   fixtures.UserId,
+			listId:   "",
 			question: fixtures.ValidQuestion,
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -74,9 +74,9 @@ func TestAddQuestionToList(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Invalid Input - Blank question.ID",
-			userId: fixtures.UserId,
-			listId: fixtures.ListId,
+			name:     "Invalid Input - Blank question.ID",
+			userId:   fixtures.UserId,
+			listId:   fixtures.ListId,
 			question: application.Question{},
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -86,9 +86,9 @@ func TestAddQuestionToList(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Write Error",
-			userId: fixtures.UserId,
-			listId: fixtures.ListId,
+			name:     "Write Error",
+			userId:   fixtures.UserId,
+			listId:   fixtures.ListId,
 			question: fixtures.ValidQuestion,
 			db: database.ManualTestConnect(
 				t.Context(),
@@ -97,7 +97,7 @@ func TestAddQuestionToList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {

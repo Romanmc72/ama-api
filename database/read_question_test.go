@@ -17,8 +17,8 @@ import (
 func TestReadQuestion(t *testing.T) {
 	logger := logging.GetLogger()
 	testCases := []struct {
-		name string
-		db database.Database
+		name    string
+		db      database.Database
 		wantErr bool
 	}{
 		{
@@ -30,7 +30,7 @@ func TestReadQuestion(t *testing.T) {
 						constants.QuestionCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.QuestionId: {
-									ID: fixtures.QuestionId,
+									ID:   fixtures.QuestionId,
 									Data: fixtures.ValidDatabaseQuestion,
 								},
 							},
@@ -50,8 +50,8 @@ func TestReadQuestion(t *testing.T) {
 						constants.QuestionCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.QuestionId: {
-									ID: fixtures.QuestionId,
-									Data: fixtures.ValidDatabaseQuestion,
+									ID:     fixtures.QuestionId,
+									Data:   fixtures.ValidDatabaseQuestion,
 									GetErr: status.Error(codes.NotFound, "unable to find document"),
 								},
 							},
@@ -71,8 +71,8 @@ func TestReadQuestion(t *testing.T) {
 						constants.QuestionCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.QuestionId: {
-									ID: fixtures.QuestionId,
-									Data: fixtures.ValidDatabaseQuestion,
+									ID:     fixtures.QuestionId,
+									Data:   fixtures.ValidDatabaseQuestion,
 									GetErr: errors.New("firestore is on a lunch break and will return after 1:00PM PST"),
 								},
 							},
@@ -93,10 +93,10 @@ func TestReadQuestion(t *testing.T) {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.QuestionId: {
 									ID: fixtures.QuestionId,
-									Data: struct{ 
-										Prompt bool `json:"prompt"`
+									Data: struct {
+										Prompt bool  `json:"prompt"`
 										Tags   []int `json:"tags"`
-									}{ Prompt: false, Tags: []int{8, 19, 99} },
+									}{Prompt: false, Tags: []int{8, 19, 99}},
 								},
 							},
 						},

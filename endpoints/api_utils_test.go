@@ -15,7 +15,7 @@ func TestGetQueryParamToIntAndInt64(t *testing.T) {
 	defaultValue := int(defaultValuei64)
 	testCases := []struct {
 		name string
-		ctx *test.MockAPIContext
+		ctx  *test.MockAPIContext
 		want int64
 	}{
 		{
@@ -51,7 +51,7 @@ func TestGetQueryParamToIntAndInt64(t *testing.T) {
 				t.Errorf("GetQueryParamToInt() wanted = %d; got = %d", tc.want, got)
 			}
 		})
-		t.Run(tc.name + "(int64)", func(t *testing.T) {
+		t.Run(tc.name+"(int64)", func(t *testing.T) {
 			got := endpoints.GetQueryParamToInt64(tc.ctx, paramName, defaultValuei64)
 			if tc.want != got {
 				t.Errorf("GetQueryParamToInt64() wanted = %d; got = %d", tc.want, got)
@@ -62,36 +62,36 @@ func TestGetQueryParamToIntAndInt64(t *testing.T) {
 
 func TestGetReadQuestionsParamsWithDefaults(t *testing.T) {
 	testCases := []struct {
-		name string
-		ctx *test.MockAPIContext
-		isRandom bool
-		wantLimit int
+		name        string
+		ctx         *test.MockAPIContext
+		isRandom    bool
+		wantLimit   int
 		wantFinalId string
-		wantTags []string
+		wantTags    []string
 	}{
 		{
 			name: "Success - Defaults",
 			ctx: &test.MockAPIContext{
 				QueryValues: map[string][]string{},
 			},
-			isRandom: false,
-			wantLimit: constants.DefaultLimit,
+			isRandom:    false,
+			wantLimit:   constants.DefaultLimit,
 			wantFinalId: "",
-			wantTags: []string{},
+			wantTags:    []string{},
 		},
 		{
 			name: "Success - Random finalId",
 			ctx: &test.MockAPIContext{
 				QueryValues: map[string][]string{
-					constants.LimitParam: {"10"},
+					constants.LimitParam:  {"10"},
 					constants.RandomParam: {"true"},
-					constants.TagParam: {"a", "b", "c"},
+					constants.TagParam:    {"a", "b", "c"},
 				},
 			},
-			isRandom: true,
-			wantLimit: 10,
+			isRandom:    true,
+			wantLimit:   10,
 			wantFinalId: "<ignore, should be random>",
-			wantTags: []string{"a", "b", "c"},
+			wantTags:    []string{"a", "b", "c"},
 		},
 		{
 			name: "Success - Pre Set finalId",
@@ -100,10 +100,10 @@ func TestGetReadQuestionsParamsWithDefaults(t *testing.T) {
 					constants.FinalIdParam: {fixtures.NewId},
 				},
 			},
-			isRandom: false,
-			wantLimit: constants.DefaultLimit,
+			isRandom:    false,
+			wantLimit:   constants.DefaultLimit,
 			wantFinalId: fixtures.NewId,
-			wantTags: []string{},
+			wantTags:    []string{},
 		},
 	}
 	for _, tc := range testCases {
@@ -112,17 +112,17 @@ func TestGetReadQuestionsParamsWithDefaults(t *testing.T) {
 
 			if tc.wantLimit != gotLimit || (!tc.isRandom && tc.wantFinalId != gotFinalId) || !slices.Equal(tc.wantTags, gotTags) {
 				t.Errorf(
-					"GetReadQuestionsParamsWithDefaults() " +
-					"wantLimit = %d; gotLimit = %d; " +
-					"wantFinalId = %s (randomFinalId = %v); gotFinalId = %s; " +
-					"wantTags = %v; gotTags = %v",
-						tc.wantLimit,
-						gotLimit,
-						tc.wantFinalId,
-						tc.isRandom,
-						gotFinalId,
-						tc.wantTags,
-						gotTags,
+					"GetReadQuestionsParamsWithDefaults() "+
+						"wantLimit = %d; gotLimit = %d; "+
+						"wantFinalId = %s (randomFinalId = %v); gotFinalId = %s; "+
+						"wantTags = %v; gotTags = %v",
+					tc.wantLimit,
+					gotLimit,
+					tc.wantFinalId,
+					tc.isRandom,
+					gotFinalId,
+					tc.wantTags,
+					gotTags,
 				)
 			}
 		})

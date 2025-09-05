@@ -14,10 +14,10 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	logger := logging.GetLogger()
-	testCases := []struct{
-		name string
-		user user.BaseUser
-		db database.Database
+	testCases := []struct {
+		name    string
+		user    user.BaseUser
+		db      database.Database
 		wantErr bool
 	}{
 		{
@@ -46,7 +46,7 @@ func TestCreateUser(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:     fixtures.UserId,
 									GetErr: errors.New("cannot read the user"),
 								},
 							},
@@ -67,7 +67,7 @@ func TestCreateUser(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
 								},
 							},
@@ -88,8 +88,8 @@ func TestCreateUser(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
-									Data: nil,
+									ID:     fixtures.UserId,
+									Data:   nil,
 									SetErr: errors.New("cannot write the user for some reason"),
 								},
 							},

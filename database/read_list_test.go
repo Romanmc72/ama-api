@@ -16,9 +16,9 @@ import (
 
 func TestReadList(t *testing.T) {
 	logger := logging.GetLogger()
-	testCases := []struct{
-		name string
-		db database.Database
+	testCases := []struct {
+		name    string
+		db      database.Database
 		wantErr bool
 	}{
 		{
@@ -30,13 +30,13 @@ func TestReadList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidUser.BaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
 											QueryDocuments: []test.MockDocumentConfig{
 												{
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidDatabaseQuestion,
 												},
 											},
@@ -75,13 +75,13 @@ func TestReadList(t *testing.T) {
 								fixtures.UserId: {
 									ID: fixtures.UserId,
 									Data: user.BaseUser{
-										Name: "ben",
-										Email: "bkenobi@jedicouncil.gov",
+										Name:         "ben",
+										Email:        "bkenobi@jedicouncil.gov",
 										Subscription: fixtures.ValidUserSubscription,
-										Settings: fixtures.ValidUserSettings,
+										Settings:     fixtures.ValidUserSettings,
 										Lists: []list.List{
 											{
-												ID: "not-the-droids-you-are-looking-for",
+												ID:   "not-the-droids-you-are-looking-for",
 												Name: "Obiwan's list",
 											},
 										},
@@ -104,14 +104,14 @@ func TestReadList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									ID: fixtures.UserId,
+									ID:   fixtures.UserId,
 									Data: fixtures.ValidUser.BaseUser,
 									NestedCollections: map[string]test.MockCollectionConfig{
 										fixtures.ListId: {
 											MockError: errors.New("error reading questions"),
 											QueryDocuments: []test.MockDocumentConfig{
 												{
-													ID: fixtures.QuestionId,
+													ID:   fixtures.QuestionId,
 													Data: fixtures.ValidDatabaseQuestion,
 												},
 											},

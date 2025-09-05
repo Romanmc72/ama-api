@@ -12,9 +12,9 @@ import (
 
 func TestDeleteQuestion(t *testing.T) {
 	logger := logging.GetLogger()
-	testCases := []struct{
-		name string
-		db database.Database
+	testCases := []struct {
+		name    string
+		db      database.Database
 		wantErr bool
 	}{
 		{
@@ -26,7 +26,7 @@ func TestDeleteQuestion(t *testing.T) {
 						constants.QuestionCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.QuestionId: {
-									ID: fixtures.QuestionId,
+									ID:   fixtures.QuestionId,
 									Data: fixtures.ValidDatabaseQuestion,
 								},
 							},
@@ -46,8 +46,8 @@ func TestDeleteQuestion(t *testing.T) {
 						constants.QuestionCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.QuestionId: {
-									ID: fixtures.QuestionId,
-									Data: fixtures.ValidDatabaseQuestion,
+									ID:        fixtures.QuestionId,
+									Data:      fixtures.ValidDatabaseQuestion,
 									DeleteErr: errors.New("delete error"),
 								},
 							},

@@ -9,11 +9,11 @@ import (
 
 func TestPostUser(t *testing.T) {
 	testCases := []struct {
-		name string
-		db test.MockUserManager
-		ctx test.MockAPIContext
+		name     string
+		db       test.MockUserManager
+		ctx      test.MockAPIContext
 		wantCode int
-		wantErr bool
+		wantErr  bool
 	}{
 		// {
 		// 	name: "Success",

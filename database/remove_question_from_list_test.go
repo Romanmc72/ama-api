@@ -153,8 +153,8 @@ func TestRemoveQuestionFromList(t *testing.T) {
 										fixtures.ListId: {
 											Documents: map[string]test.MockDocumentConfig{
 												fixtures.QuestionId: {
-													Data: fixtures.ValidQuestion,
-													DeleteErr:  errors.New("some database error"),
+													Data:      fixtures.ValidQuestion,
+													DeleteErr: errors.New("some database error"),
 												},
 											},
 										},

@@ -31,4 +31,3 @@ func (q *DatabaseQuestion) String() string {
 	}
 	return string(data)
 }
-

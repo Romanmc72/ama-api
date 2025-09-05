@@ -118,9 +118,9 @@ func TestUpdateList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
-									Data: fixtures.ValidBaseUser,
-									ID:   fixtures.UserId,
-									GetErr:  errors.New("get error"),
+									Data:   fixtures.ValidBaseUser,
+									ID:     fixtures.UserId,
+									GetErr: errors.New("get error"),
 								},
 							},
 						},

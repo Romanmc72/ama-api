@@ -9,9 +9,9 @@ import (
 
 // MockUserManager implements UserManager interface for testing
 type MockUserManager struct {
-	Users map[string]MockUserConfig
+	Users          map[string]MockUserConfig
 	MockCreateUser func(userData user.BaseUser) (application.User, error)
-	MockReadUser func(id string) (application.User, error)
+	MockReadUser   func(id string) (application.User, error)
 	MockUpdateUser func(userData interfaces.UserConverter) error
 	MockDeleteUser func(id string) (time.Time, error)
 }
