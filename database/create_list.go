@@ -5,8 +5,8 @@ import (
 	"ama/api/constants"
 	"ama/api/interfaces"
 	"errors"
+	"strings"
 
-	"github.com/google/uuid"
 	"google.golang.org/api/iterator"
 )
 
@@ -14,7 +14,7 @@ import (
 // "Creates" a list for a given user, without a question in that list, the list does not "exist" per se
 // but it is a placeholder for the user to add questions to it
 func (db *Database) CreateList(userId string, l list.List) error {
-	if userId == "" {
+	if strings.Trim(userId, " ") == "" {
 		return errors.New("user id cannot be empty")
 	}
 	user, err := db.ReadUser(userId)
@@ -27,7 +27,7 @@ func (db *Database) CreateList(userId string, l list.List) error {
 		return err
 	}
 	if l.ID == "" {
-		l.ID = uuid.NewString()
+		l.ID = db.client.NewID()
 		db.logger.Debug(
 			"list has no ID, generated a new one",
 			"list", l,

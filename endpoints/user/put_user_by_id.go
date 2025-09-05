@@ -16,12 +16,12 @@ func PutUserByUserId(c interfaces.APIContext, db interfaces.UserWriter) {
 	var user application.User
 	if err := c.BindJSON(&user); err != nil {
 		logger.Error("Failed to bind user data", constants.UserIdPathIdentifier, userId, "error", err, "request", c.GetString("body"))
-		c.IndentedJSON(http.StatusBadRequest, responses.NewError("unable to update user"))
+		c.IndentedJSON(http.StatusBadRequest, responses.NewError("invalid input"))
 		return
 	}
 	user.ID = userId
 	if err := db.UpdateUser(user); err != nil {
-		logger.Error("Failed to bind user data", constants.UserIdPathIdentifier, userId, "error", err, "request", c.GetString("body"))
+		logger.Error("Failed to update user", constants.UserIdPathIdentifier, userId, "error", err, "request", c.GetString("body"))
 		c.IndentedJSON(http.StatusInternalServerError, responses.NewError("unable to update user"))
 		return
 	}

@@ -1,5 +1,7 @@
 package list
 
+const LikedQuestionsListName = "Liked questions"
+
 // A list of questions
 type List struct {
 	// The unique identifier for the list.

@@ -6,6 +6,7 @@ import (
 	"ama/api/interfaces"
 )
 
+// TODO: prevent updating the name of the "Liked questions" list or removing it
 // Updates the user in the database with the provided user data.
 func (db *Database) UpdateUser(userData interfaces.UserConverter) error {
 	u := userData.User()

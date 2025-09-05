@@ -25,14 +25,47 @@ type MockAPIContext struct {
 	values   map[string]any
 }
 
+type MockAPIContextConfig struct {
+	InputJSON   []byte
+	Params      map[string]string
+	QueryValues map[string][]string
+	Headers     map[string]string
+	Values      map[string]any
+}
+
 // NewMockAPIContext creates a new instance of MockAPIContext
-func NewMockAPIContext() *MockAPIContext {
+func NewMockAPIContext(cfg MockAPIContextConfig) *MockAPIContext {
+	var params map[string]string
+	if cfg.Params != nil {
+		params = cfg.Params
+	} else {
+		params = make(map[string]string)
+	}
+	var queryValues map[string][]string
+	if cfg.QueryValues != nil {
+		queryValues = cfg.QueryValues
+	} else {
+		queryValues = make(map[string][]string)
+	}
+	var headers map[string]string
+	if cfg.Headers != nil {
+		headers = cfg.Headers
+	} else {
+		headers = make(map[string]string)
+	}
+	var values map[string]any
+	if cfg.Values != nil {
+		values = cfg.Values
+	} else {
+		values = make(map[string]any)
+	}
 	return &MockAPIContext{
-		Params:      make(map[string]string),
-		QueryValues: make(map[string][]string),
+		InputJSON:   cfg.InputJSON,
+		Params:      params,
+		QueryValues: queryValues,
 		validate:    validator.New(),
-		headers:     make(map[string]string),
-		values:      make(map[string]any),
+		headers:     headers,
+		values:      values,
 	}
 }
 

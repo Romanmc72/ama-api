@@ -19,7 +19,7 @@ func TestVerifyRequiredScope(t *testing.T) {
 	}{
 		{
 			name:    "All Required Scopes Present",
-			context: test.NewMockAPIContext(),
+			context: test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			claims: map[string]any{
 				"role": "admin",
 				"tier": "premium",
@@ -32,7 +32,7 @@ func TestVerifyRequiredScope(t *testing.T) {
 		},
 		{
 			name:    "Missing One Scope",
-			context: test.NewMockAPIContext(),
+			context: test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			claims: map[string]any{
 				"tier": "premium",
 			},
@@ -44,7 +44,7 @@ func TestVerifyRequiredScope(t *testing.T) {
 		},
 		{
 			name:    "Missing All Scopes",
-			context: test.NewMockAPIContext(),
+			context: test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			claims:  nil,
 			requiredScopes: map[string]any{
 				"role": "admin",
@@ -54,14 +54,14 @@ func TestVerifyRequiredScope(t *testing.T) {
 		},
 		{
 			name:           "No Required Scopes",
-			context:        test.NewMockAPIContext(),
+			context:        test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			claims:         nil,
 			requiredScopes: map[string]any{},
 			wantErr:        false,
 		},
 		{
 			name:    "Malformatted claims",
-			context: test.NewMockAPIContext(),
+			context: test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			claims:  21,
 			requiredScopes: map[string]any{
 				"role": "admin",

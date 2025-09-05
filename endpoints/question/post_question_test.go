@@ -56,8 +56,9 @@ func TestPostQuestion(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockCtx := test.NewMockAPIContext()
-			mockCtx.InputJSON = tt.inputBody
+			mockCtx := test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: tt.inputBody,
+			})
 			mockDB := test.NewMockQuestionManager()
 			mockDB.ShouldError = tt.dbShouldFail
 

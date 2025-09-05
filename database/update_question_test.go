@@ -49,7 +49,7 @@ func TestUpdateQuestion(t *testing.T) {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.QuestionId: {
 									Data: fixtures.ValidNewQuestion,
-									Err:  errors.New("write error"),
+									SetErr:  errors.New("write error"),
 								},
 							},
 						},
@@ -66,14 +66,7 @@ func TestUpdateQuestion(t *testing.T) {
 			db: database.ManualTestConnect(t.Context(),
 				test.NewMockDatabase(&test.MockDBConfig{
 					Collections: map[string]test.MockCollectionConfig{
-						constants.QuestionCollection: {
-							Documents: map[string]test.MockDocumentConfig{
-								fixtures.QuestionId: {
-									Data: fixtures.ValidNewQuestion,
-									Err:  errors.New("write error"),
-								},
-							},
-						},
+						constants.QuestionCollection: {},
 					},
 				}),
 				logger,

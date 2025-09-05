@@ -51,7 +51,7 @@ func GetQueryParamToInt64(c interfaces.APIContext, paramName string, defaultValu
 
 // Generates a random string based on the base64 encoded output of a random
 // byte slice defined by length. length does not determine the final string
-// length. The final string will be at the longest the same size as length.
+// length. The final string will be at the *longest* the same size as length.
 func generateRandomString(length int) string {
 	if length <= 0 {
 		length = 1

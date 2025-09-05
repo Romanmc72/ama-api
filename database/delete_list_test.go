@@ -1,48 +1,26 @@
 package database_test
 
 import (
-	"ama/api/application/list"
 	"ama/api/constants"
 	"ama/api/database"
 	"ama/api/logging"
 	"ama/api/test"
 	"ama/api/test/fixtures"
-	"context"
 	"errors"
 	"testing"
 
 	"cloud.google.com/go/firestore"
 )
 
-func TestUpdateList(t *testing.T) {
+func TestDeleteList(t *testing.T) {
 	logger := logging.GetLogger()
-	txErrDb := test.NewMockDatabase(&test.MockDBConfig{
-		Collections: map[string]test.MockCollectionConfig{
-			constants.UserCollection: {
-				Documents: map[string]test.MockDocumentConfig{
-					fixtures.UserId: {
-						GetErr: errors.New("get error"),
-					},
-				},
-			},
-		},
-	})
-	txErrDb.MockRunTransaction = func(
-		ctx context.Context,
-		f func(context.Context, *firestore.Transaction) error,
-		t ...firestore.TransactionOption,
-	) error {
-		return errors.New("Something went wrong in the transaction")
-	}
-	testCases := []struct {
-		name    string
-		db      database.Database
-		userId  string
-		list    *list.List
+	testCases := []struct{
+		name string
+		db database.Database
 		wantErr bool
 	}{
 		{
-			name: "Updates List",
+			name: "Success",
 			db: database.ManualTestConnect(
 				t.Context(),
 				test.NewMockDatabase(&test.MockDBConfig{
@@ -50,8 +28,18 @@ func TestUpdateList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
+									ID: fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
-									ID:   fixtures.UserId,
+									NestedCollections: map[string]test.MockCollectionConfig{
+										fixtures.ListId: {
+											QueryDocuments: []test.MockDocumentConfig{
+												{
+													ID: fixtures.QuestionId,
+													Data: fixtures.ValidQuestion,
+												},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -59,12 +47,10 @@ func TestUpdateList(t *testing.T) {
 				}),
 				logger,
 			),
-			userId:  fixtures.QuestionId,
-			list:    &fixtures.ValidLists[0],
 			wantErr: false,
 		},
 		{
-			name: "Missing List ID",
+			name: "Delete Collection Error",
 			db: database.ManualTestConnect(
 				t.Context(),
 				test.NewMockDatabase(&test.MockDBConfig{
@@ -72,8 +58,13 @@ func TestUpdateList(t *testing.T) {
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
+									ID: fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
-									ID:   fixtures.UserId,
+									NestedCollections: map[string]test.MockCollectionConfig{
+										fixtures.ListId: {
+											MockError: errors.New("delete error"),
+										},
+									},
 								},
 							},
 						},
@@ -81,23 +72,34 @@ func TestUpdateList(t *testing.T) {
 				}),
 				logger,
 			),
-			userId: fixtures.QuestionId,
-			list: &list.List{
-				Name: "I have a name but no ID",
-			},
 			wantErr: true,
 		},
 		{
-			name: "Missing User ID",
+			name: "Delete Collection Error - BulkWriter",
 			db: database.ManualTestConnect(
 				t.Context(),
 				test.NewMockDatabase(&test.MockDBConfig{
+					BulkWriter: test.MockBulkWriter{
+						MockDelete: func(doc *firestore.DocumentRef) (*firestore.BulkWriterJob, error) {
+							return nil, errors.New("unable to delete")
+						},
+					},
 					Collections: map[string]test.MockCollectionConfig{
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
+									ID: fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
-									ID:   fixtures.UserId,
+									NestedCollections: map[string]test.MockCollectionConfig{
+										fixtures.ListId: {
+											QueryDocuments: []test.MockDocumentConfig{
+												{
+													ID: fixtures.QuestionId,
+													Data: fixtures.ValidDatabaseQuestion,
+												},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -105,22 +107,30 @@ func TestUpdateList(t *testing.T) {
 				}),
 				logger,
 			),
-			userId:  "",
-			list:    &fixtures.ValidLists[0],
 			wantErr: true,
 		},
 		{
-			name: "List Not Found",
+			name: "Transaction Error",
 			db: database.ManualTestConnect(
 				t.Context(),
 				test.NewMockDatabase(&test.MockDBConfig{
+					TransacitonErr: errors.New("transaction failure"),
 					Collections: map[string]test.MockCollectionConfig{
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
 								fixtures.UserId: {
+									ID: fixtures.UserId,
 									Data: fixtures.ValidBaseUser,
-									ID:   fixtures.UserId,
-									GetErr:  errors.New("get error"),
+									NestedCollections: map[string]test.MockCollectionConfig{
+										fixtures.ListId: {
+											QueryDocuments: []test.MockDocumentConfig{
+												{
+													ID: fixtures.QuestionId,
+													Data: fixtures.ValidQuestion,
+												},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -128,26 +138,14 @@ func TestUpdateList(t *testing.T) {
 				}),
 				logger,
 			),
-			userId: "",
-			list: &list.List{
-				ID:   "incorrect-list-id",
-				Name: "too bad this will fail",
-			},
-			wantErr: true,
-		},
-		{
-			name:    "Transaction Error",
-			db:      database.ManualTestConnect(t.Context(), txErrDb, logger),
-			userId:  fixtures.UserId,
-			list:    &fixtures.ValidLists[0],
 			wantErr: true,
 		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := tc.db.UpdateList(tc.userId, *tc.list)
+			err := tc.db.DeleteList(fixtures.UserId, fixtures.ListId)
 			if (err != nil) != tc.wantErr {
-				t.Errorf("UpdateList() error = %v, wantErr %v", err, tc.wantErr)
+				t.Errorf("DeleteList() wantedErr = %v; got = %v", tc.wantErr, err)
 			}
 		})
 	}

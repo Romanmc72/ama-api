@@ -7,8 +7,10 @@ import (
 )
 
 func (db *Database) AddQuestionToList(userId string, listId string, question application.Question) error {
-	if question.ID == "" {
-		return errors.New("question ID cannot be empty")
+	if userId == "" || listId == "" || question.ID == "" {
+		err := errors.New("userId, listId, and question.ID cannot be empty")
+		db.logger.Error(err.Error(), "userId", userId, "listId", listId, "question", question)
+		return err
 	}
 	db.logger.Debug("Adding question to list", "user", userId, "list", listId, "question", question)
 	result, err := db.client.

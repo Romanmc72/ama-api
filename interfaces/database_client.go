@@ -7,6 +7,7 @@ import (
 )
 
 type DatabaseClient interface {
+	NewID() string
 	Collection(name string) CollectionRef
 	RunTransaction(
 		ctx context.Context,
@@ -51,6 +52,7 @@ type DocumentSnapshot interface {
 	DataTo(v any) error
 	ID() string
 	Ref() *firestore.DocumentRef
+	Exists() bool
 }
 
 type DocumentIterator interface {

@@ -51,6 +51,7 @@ func (db *Database) readQuestionCollection(collectionRef interfaces.CollectionRe
 				break
 			}
 			db.logger.Error("Encountered an error iterating questions", "error", err)
+			return questions, err
 		}
 		doc.DataTo(&retrievedQuestion)
 		retrievedQuestion.ID = doc.ID()

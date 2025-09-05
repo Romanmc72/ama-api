@@ -28,9 +28,9 @@ func TestRemoveQuestionFromList(t *testing.T) {
 					Collections: map[string]test.MockCollectionConfig{
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
-								fixtures.UserValid.ID: {
+								fixtures.UserId: {
 									NestedCollections: map[string]test.MockCollectionConfig{
-										fixtures.ValidLists[0].ID: {
+										fixtures.ListId: {
 											Documents: map[string]test.MockDocumentConfig{
 												fixtures.QuestionId: {
 													Data: fixtures.ValidQuestion,
@@ -45,9 +45,9 @@ func TestRemoveQuestionFromList(t *testing.T) {
 				}),
 				logger,
 			),
-			userId:     fixtures.UserValid.ID,
+			userId:     fixtures.UserId,
 			questionId: fixtures.QuestionId,
-			listId:     fixtures.ValidLists[0].ID,
+			listId:     fixtures.ListId,
 			wantErr:    false,
 		},
 		{
@@ -58,9 +58,9 @@ func TestRemoveQuestionFromList(t *testing.T) {
 					Collections: map[string]test.MockCollectionConfig{
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
-								fixtures.UserValid.ID: {
+								fixtures.UserId: {
 									NestedCollections: map[string]test.MockCollectionConfig{
-										fixtures.ValidLists[0].ID: {
+										fixtures.ListId: {
 											Documents: map[string]test.MockDocumentConfig{
 												fixtures.QuestionId: {
 													Data: fixtures.ValidQuestion,
@@ -77,7 +77,7 @@ func TestRemoveQuestionFromList(t *testing.T) {
 			),
 			userId:     "",
 			questionId: fixtures.QuestionId,
-			listId:     fixtures.ValidLists[0].ID,
+			listId:     fixtures.ListId,
 			wantErr:    true,
 		},
 		{
@@ -88,9 +88,9 @@ func TestRemoveQuestionFromList(t *testing.T) {
 					Collections: map[string]test.MockCollectionConfig{
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
-								fixtures.UserValid.ID: {
+								fixtures.UserId: {
 									NestedCollections: map[string]test.MockCollectionConfig{
-										fixtures.ValidLists[0].ID: {
+										fixtures.ListId: {
 											Documents: map[string]test.MockDocumentConfig{
 												fixtures.QuestionId: {
 													Data: fixtures.ValidQuestion,
@@ -105,7 +105,7 @@ func TestRemoveQuestionFromList(t *testing.T) {
 				}),
 				logger,
 			),
-			userId:     fixtures.UserValid.ID,
+			userId:     fixtures.UserId,
 			questionId: fixtures.QuestionId,
 			listId:     "",
 			wantErr:    true,
@@ -118,9 +118,9 @@ func TestRemoveQuestionFromList(t *testing.T) {
 					Collections: map[string]test.MockCollectionConfig{
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
-								fixtures.UserValid.ID: {
+								fixtures.UserId: {
 									NestedCollections: map[string]test.MockCollectionConfig{
-										fixtures.ValidLists[0].ID: {
+										fixtures.ListId: {
 											Documents: map[string]test.MockDocumentConfig{
 												fixtures.QuestionId: {
 													Data: fixtures.ValidQuestion,
@@ -135,9 +135,9 @@ func TestRemoveQuestionFromList(t *testing.T) {
 				}),
 				logger,
 			),
-			userId:     fixtures.UserValid.ID,
+			userId:     fixtures.UserId,
 			questionId: "",
-			listId:     fixtures.ValidLists[0].ID,
+			listId:     fixtures.ListId,
 			wantErr:    true,
 		},
 		{
@@ -148,13 +148,13 @@ func TestRemoveQuestionFromList(t *testing.T) {
 					Collections: map[string]test.MockCollectionConfig{
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
-								fixtures.UserValid.ID: {
+								fixtures.UserId: {
 									NestedCollections: map[string]test.MockCollectionConfig{
-										fixtures.ValidLists[0].ID: {
+										fixtures.ListId: {
 											Documents: map[string]test.MockDocumentConfig{
 												fixtures.QuestionId: {
 													Data: fixtures.ValidQuestion,
-													Err:  errors.New("some database error"),
+													DeleteErr:  errors.New("some database error"),
 												},
 											},
 										},
@@ -166,9 +166,9 @@ func TestRemoveQuestionFromList(t *testing.T) {
 				}),
 				logger,
 			),
-			userId:     fixtures.UserValid.ID,
+			userId:     fixtures.UserId,
 			questionId: fixtures.QuestionId,
-			listId:     fixtures.ValidLists[0].ID,
+			listId:     fixtures.ListId,
 			wantErr:    true,
 		},
 	}

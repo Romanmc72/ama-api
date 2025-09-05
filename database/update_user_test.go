@@ -13,7 +13,6 @@ import (
 )
 
 func TestUpdateUser(t *testing.T) {
-	userId := "test-user-id"
 	testCases := []struct {
 		name    string
 		db      database.Database
@@ -30,7 +29,7 @@ func TestUpdateUser(t *testing.T) {
 				logging.GetLogger(),
 			),
 			user: &application.User{
-				ID:       userId,
+				ID:       fixtures.UserId,
 				BaseUser: user.BaseUser{},
 			},
 			wantErr: true,
@@ -43,9 +42,9 @@ func TestUpdateUser(t *testing.T) {
 					Collections: map[string]test.MockCollectionConfig{
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
-								userId: {
-									ID:  userId,
-									Err: errors.New("write error"),
+								fixtures.UserId: {
+									ID:  fixtures.UserId,
+									SetErr: errors.New("write error"),
 								},
 							},
 						},
@@ -54,8 +53,8 @@ func TestUpdateUser(t *testing.T) {
 				logging.GetLogger(),
 			),
 			user: &application.User{
-				ID:       userId,
-				BaseUser: fixtures.BaseUserValid,
+				ID:       fixtures.UserId,
+				BaseUser: fixtures.ValidBaseUser,
 			},
 			wantErr: true,
 		},
@@ -67,8 +66,8 @@ func TestUpdateUser(t *testing.T) {
 					Collections: map[string]test.MockCollectionConfig{
 						constants.UserCollection: {
 							Documents: map[string]test.MockDocumentConfig{
-								userId: {
-									ID: userId,
+								fixtures.UserId: {
+									ID: fixtures.UserId,
 								},
 							},
 						},
@@ -77,8 +76,8 @@ func TestUpdateUser(t *testing.T) {
 				logging.GetLogger(),
 			),
 			user: &application.User{
-				ID:       userId,
-				BaseUser: fixtures.BaseUserValid,
+				ID:       fixtures.UserId,
+				BaseUser: fixtures.ValidBaseUser,
 			},
 			wantErr: false,
 		},

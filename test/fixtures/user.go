@@ -18,13 +18,17 @@ var ValidUserSettings = user.UserSettings{
 
 var ValidLists = []list.List{
 	{
-		ID:   "list1",
+		ID:   ListId,
 		Name: "List 1",
+	},
+	{
+		ID:	  NewId,
+		Name: list.LikedQuestionsListName,
 	},
 }
 
-var BaseUserValid = user.BaseUser{
-	FirebaseID:   "valid-firebase-id",
+var ValidBaseUser = user.BaseUser{
+	FirebaseID:   UserId,
 	Email:        "test@test.com",
 	Tier:         user.FreeTier,
 	Subscription: ValidUserSubscription,
@@ -32,7 +36,7 @@ var BaseUserValid = user.BaseUser{
 	Lists:        ValidLists,
 }
 
-var UserValid = application.User{
-	ID:       "valid-user-id",
-	BaseUser: BaseUserValid,
+var ValidUser = application.User{
+	ID:       UserId,
+	BaseUser: ValidBaseUser,
 }

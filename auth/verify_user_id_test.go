@@ -19,28 +19,28 @@ func TestVerifyUserID(t *testing.T) {
 	}{
 		{
 			name:    "Matching User IDs",
-			context: test.NewMockAPIContext(),
+			context: test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenId: "user123",
 			userId:  "user123",
 			wantErr: false,
 		},
 		{
 			name:    "Non-Matching User IDs",
-			context: test.NewMockAPIContext(),
+			context: test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenId: "user123",
 			userId:  "user456",
 			wantErr: true,
 		},
 		{
 			name:    "Missing Token User ID",
-			context: test.NewMockAPIContext(),
+			context: test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenId: "",
 			userId:  "user456",
 			wantErr: true,
 		},
 		{
 			name:    "Missing Path User ID",
-			context: test.NewMockAPIContext(),
+			context: test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenId: "user123",
 			userId:  "",
 			wantErr: true,

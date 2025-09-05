@@ -3,6 +3,7 @@ package test
 
 import (
 	"ama/api/interfaces"
+	"ama/api/test/fixtures"
 	"context"
 	"encoding/json"
 	"errors"
@@ -10,6 +11,8 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // MockDatabaseClient is a mock for DatabaseClient.
@@ -22,6 +25,10 @@ type MockDatabaseClient struct {
 	) error
 	MockClose      func() error
 	MockBulkWriter func(ctx context.Context) interfaces.BulkWriter
+}
+
+func (m *MockDatabaseClient) NewID() string {
+	return fixtures.NewId
 }
 
 func (m *MockDatabaseClient) Collection(name string) interfaces.CollectionRef {
@@ -253,6 +260,7 @@ type MockDocumentSnapshot struct {
 	MockDataTo func(v any) error
 	MockID     func() string
 	MockRef    func() *firestore.DocumentRef
+	MockExists func() bool
 	// You can add a public field for the ID to make it easy to set.
 	RefID string
 }
@@ -278,13 +286,24 @@ func (m *MockDocumentSnapshot) Ref() *firestore.DocumentRef {
 	return &firestore.DocumentRef{}
 }
 
+func (m *MockDocumentSnapshot) Exists() bool {
+	if m.MockExists != nil {
+		return m.MockExists()
+	}
+	return false
+}
+
 // MockDocumentIterator is a mock for DocumentIterator.
 type MockDocumentIterator struct {
 	Snapshots []interfaces.DocumentSnapshot
 	Index     int
+	err 			error
 }
 
 func (m *MockDocumentIterator) Next() (interfaces.DocumentSnapshot, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
 	if m.Index >= len(m.Snapshots) {
 		return nil, iterator.Done
 	}
@@ -295,12 +314,39 @@ func (m *MockDocumentIterator) Next() (interfaces.DocumentSnapshot, error) {
 
 func (m *MockDocumentIterator) Stop() {}
 
+type MockQuery struct {
+	documentIterator interfaces.DocumentIterator
+}
+
+func (m *MockQuery) Documents(ctx context.Context) interfaces.DocumentIterator {
+	return m.documentIterator
+}
+
+func (m *MockQuery) StartAfter(docID string) interfaces.Query {
+	return m
+}
+
+func (m *MockQuery) Where(path, op string, value any) interfaces.Query {
+	return m
+}
+
+func (m *MockQuery) Limit(n int) interfaces.Query {
+	return m
+}
+
+func (m *MockQuery) OrderBy(path string, direction firestore.Direction) interfaces.Query {
+	return m
+}
+
+
 // --- Test Setup Helpers ---
 
 // MockDBConfig allows for easy configuration of the mock database.
 // This is the "clever" part that simplifies your tests.
 type MockDBConfig struct {
 	Collections map[string]MockCollectionConfig
+	TransacitonErr error
+	BulkWriter MockBulkWriter
 }
 
 type MockCollectionConfig struct {
@@ -313,7 +359,9 @@ type MockCollectionConfig struct {
 type MockDocumentConfig struct {
 	Data              interface{}
 	ID                string
-	Err               error
+	GetErr					 	error
+	SetErr					 	error
+	DeleteErr 			 	error
 	NestedCollections map[string]MockCollectionConfig
 }
 
@@ -322,26 +370,34 @@ func NewMockDatabase(cfg *MockDBConfig) *MockDatabaseClient {
 	// A recursive function to build out the nested structure.
 	var createMockCollection func(config MockCollectionConfig) interfaces.CollectionRef
 	createMockCollection = func(config MockCollectionConfig) interfaces.CollectionRef {
-		mockIter := &MockDocumentIterator{}
+		if config.Documents == nil {
+			config.Documents = map[string]MockDocumentConfig{}
+		}
+		if config.QueryDocuments == nil {
+			config.QueryDocuments = []MockDocumentConfig{}
+		}
+		mockIter := &MockDocumentIterator{err: config.MockError}
 		if len(config.QueryDocuments) > 0 {
 			for _, docCfg := range config.QueryDocuments {
 				mockSnap := &MockDocumentSnapshot{RefID: docCfg.ID}
 				mockSnap.MockDataTo = func(v any) error {
 					if docCfg.Data != nil {
-						// Simple way to copy data for the mock
-						val := docCfg.Data.(interface {
-							String() string
-						})
-						v.(interface {
-							Set(s string)
-						}).Set(val.String())
+						dataBytes, err := json.Marshal(docCfg.Data)
+						if err != nil {
+							return err
+						}
+						return json.Unmarshal(dataBytes, &v)
 					}
-					return nil
+					return errors.New("data is nil")
 				}
 				mockIter.Snapshots = append(mockIter.Snapshots, mockSnap)
 			}
 		} else {
 			mockIter.Snapshots = []interfaces.DocumentSnapshot{}
+		}
+
+		mockQuery := &MockQuery{
+			documentIterator: mockIter,
 		}
 
 		mockCollection := &MockCollectionRef{
@@ -351,21 +407,29 @@ func NewMockDatabase(cfg *MockDBConfig) *MockDatabaseClient {
 			MockAdd: func(ctx context.Context, data any) (interfaces.DocumentRef, *firestore.WriteResult, error) {
 				return &MockDocumentRef{}, &firestore.WriteResult{UpdateTime: time.Now()}, config.MockError
 			},
+			MockStartAfter: func(docID string) interfaces.Query {
+				return mockQuery
+			},
+			MockWhere: func(path, op string, value any) interfaces.Query {
+				return mockQuery
+			},
+			MockLimit: func(n int) interfaces.Query {
+				return mockQuery
+			},
+			MockOrderBy: func(path string, direction firestore.Direction) interfaces.Query {
+				return mockQuery
+			},
 		}
 
 		mockCollection.MockDoc = func(id string) interfaces.DocumentRef {
 			docConfig, ok := config.Documents[id]
+			var mockGetFn func(ctx context.Context) (interfaces.DocumentSnapshot, error)
 			if !ok {
-				return &MockDocumentRef{
-					RefID: id,
-					MockGet: func(ctx context.Context) (interfaces.DocumentSnapshot, error) {
-						return nil, errors.New("document not found")
-					},
-				}
-			}
-			return &MockDocumentRef{
-				RefID: docConfig.ID,
-				MockGet: func(ctx context.Context) (interfaces.DocumentSnapshot, error) {
+				mockGetFn = func(ctx context.Context) (interfaces.DocumentSnapshot, error) {
+						return nil, status.Error(codes.NotFound, "user not found")
+					}
+			} else {
+				mockGetFn = func(ctx context.Context) (interfaces.DocumentSnapshot, error) {
 					return &MockDocumentSnapshot{
 						RefID: docConfig.ID,
 						MockDataTo: func(v any) error {
@@ -378,20 +442,29 @@ func NewMockDatabase(cfg *MockDBConfig) *MockDatabaseClient {
 							}
 							return errors.New("data is nil")
 						},
-					}, docConfig.Err
-				},
+						MockExists: func() bool {
+							return docConfig.Data != nil
+						},
+					}, docConfig.GetErr
+				}
+			}
+			return &MockDocumentRef{
+				RefID: docConfig.ID,
+				MockGet: mockGetFn,
 				MockSet: func(ctx context.Context, data interface{}, opts ...firestore.SetOption) (*firestore.WriteResult, error) {
 					config.Documents[docConfig.ID] = MockDocumentConfig{
 						Data:              data,
 						ID:                docConfig.ID,
-						Err:               docConfig.Err,
+						GetErr:						 docConfig.GetErr,
+						SetErr:						 docConfig.SetErr,
+						DeleteErr:				 docConfig.DeleteErr,
 						NestedCollections: docConfig.NestedCollections,
 					}
-					return &firestore.WriteResult{UpdateTime: time.Now()}, docConfig.Err
+					return &firestore.WriteResult{UpdateTime: time.Now()}, docConfig.SetErr
 				},
 				MockDelete: func(ctx context.Context) (*firestore.WriteResult, error) {
 					delete(config.Documents, docConfig.ID)
-					return &firestore.WriteResult{UpdateTime: time.Now()}, docConfig.Err
+					return &firestore.WriteResult{UpdateTime: time.Now()}, docConfig.DeleteErr
 				},
 				MockCollection: func(name string) interfaces.CollectionRef {
 					if nestedColConfig, ok := docConfig.NestedCollections[name]; ok {
@@ -410,6 +483,15 @@ func NewMockDatabase(cfg *MockDBConfig) *MockDatabaseClient {
 			return createMockCollection(collectionConfig)
 		}
 		return &MockCollectionRef{}
+	}
+	if cfg.TransacitonErr != nil {
+		mockClient.MockRunTransaction = func(ctx context.Context, f func(context.Context, *firestore.Transaction) error, t ...firestore.TransactionOption) error {
+			return cfg.TransacitonErr
+		}
+	}
+
+	mockClient.MockBulkWriter = func(ctx context.Context) interfaces.BulkWriter {
+		return &cfg.BulkWriter
 	}
 
 	return mockClient

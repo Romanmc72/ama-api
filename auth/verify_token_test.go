@@ -25,7 +25,7 @@ func TestVerifyToken(t *testing.T) {
 	}{
 		{
 			name:        "Valid Token",
-			context:     test.NewMockAPIContext(),
+			context:     test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenString: "Bearer valid-token",
 			verifier: test.NewMockJWTVerifier(&firebaseAuth.Token{
 				UID:    userId,
@@ -35,7 +35,7 @@ func TestVerifyToken(t *testing.T) {
 		},
 		{
 			name:        "Valid Token - No Bearer Prefix",
-			context:     test.NewMockAPIContext(),
+			context:     test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenString: "valid-token",
 			verifier: test.NewMockJWTVerifier(&firebaseAuth.Token{
 				UID:    userId,
@@ -45,7 +45,7 @@ func TestVerifyToken(t *testing.T) {
 		},
 		{
 			name:        "Token Invalid",
-			context:     test.NewMockAPIContext(),
+			context:     test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenString: "Bearer looks-like-a-valid-token",
 			verifier: test.NewMockJWTVerifier(&firebaseAuth.Token{
 				UID:    userId,
@@ -55,21 +55,21 @@ func TestVerifyToken(t *testing.T) {
 		},
 		{
 			name:        "Token Blank",
-			context:     test.NewMockAPIContext(),
+			context:     test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenString: "",
 			verifier:    test.NewMockJWTVerifier(nil, nil),
 			wantErr:     true,
 		},
 		{
 			name:        "Token nil",
-			context:     test.NewMockAPIContext(),
+			context:     test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenString: "valid-token",
 			verifier:    test.NewMockJWTVerifier(nil, nil),
 			wantErr:     true,
 		},
 		{
 			name:        "Blank UID",
-			context:     test.NewMockAPIContext(),
+			context:     test.NewMockAPIContext(test.MockAPIContextConfig{}),
 			tokenString: "valid-token",
 			verifier: test.NewMockJWTVerifier(&firebaseAuth.Token{
 				UID:    "",
