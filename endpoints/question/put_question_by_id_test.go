@@ -17,6 +17,7 @@ import (
 
 func TestPutQuestionById(t *testing.T) {
 	qBytes, _ := json.Marshal(fixtures.ValidNewQuestion)
+	invalidQBytes, _ := json.Marshal(fixtures.InvalidNewQuestion)
 	testCases := []struct {
 		name     string
 		db       test.MockQuestionManager
@@ -41,7 +42,39 @@ func TestPutQuestionById(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Failure - Bad Request",
+			name: "Failure - Bad Request Missing Question Id",
+			db: *test.NewMockQuestionManager(test.MockQuestionManagerConfig{
+				UpdateQuestion: func(id string, questionData interfaces.QuestionConverter) (application.Question, error) {
+					return fixtures.ValidQuestion, nil
+				},
+			}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: qBytes,
+				Params: map[string]string{
+					constants.QuestionIdPathIdentifier: "       ",
+				},
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
+		},
+		{
+			name: "Failure - Bad Request Invalid Data",
+			db: *test.NewMockQuestionManager(test.MockQuestionManagerConfig{
+				UpdateQuestion: func(id string, questionData interfaces.QuestionConverter) (application.Question, error) {
+					return fixtures.ValidQuestion, nil
+				},
+			}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: invalidQBytes,
+				Params: map[string]string{
+					constants.QuestionIdPathIdentifier: fixtures.QuestionId,
+				},
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
+		},
+		{
+			name: "Failure - Bad Request JSON Bind Error",
 			db: *test.NewMockQuestionManager(test.MockQuestionManagerConfig{
 				UpdateQuestion: func(id string, questionData interfaces.QuestionConverter) (application.Question, error) {
 					return fixtures.ValidQuestion, nil

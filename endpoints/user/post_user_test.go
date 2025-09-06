@@ -15,7 +15,8 @@ import (
 )
 
 func TestPostUser(t *testing.T) {
-	validUserBytes, _ := json.Marshal(fixtures.ValidUser.BaseUser)
+	validUserBytes, _ := json.Marshal(fixtures.ValidBaseUser)
+	invalidUserBytes, _ := json.Marshal(fixtures.InvalidBaseUser)
 	testCases := []struct {
 		name     string
 		db       test.MockUserManager
@@ -37,10 +38,19 @@ func TestPostUser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Failure - Bad Request",
+			name: "Failure - Invalid JSON",
 			db:   *test.NewMockUserManager(test.MockUserManagerConfig{}),
 			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
 				InputJSON: []byte(`{"settings": "invalid input data"`),
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
+		},
+		{
+			name: "Failure - Invalid Input Data",
+			db:   *test.NewMockUserManager(test.MockUserManagerConfig{}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: invalidUserBytes,
 			}),
 			wantCode: http.StatusBadRequest,
 			wantErr:  true,

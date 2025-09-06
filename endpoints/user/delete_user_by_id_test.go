@@ -39,6 +39,17 @@ func TestDeleteUserById(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "Failure - Bad Request",
+			db:   *test.NewMockUserManager(test.MockUserManagerConfig{}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				Params: map[string]string{
+					constants.UserIdPathIdentifier: "  ",
+				},
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
+		},
+		{
 			name: "Failure - Internal Server Error",
 			db: *test.NewMockUserManager(test.MockUserManagerConfig{
 				DeleteUser: func(id string) (time.Time, error) {

@@ -8,6 +8,7 @@ import (
 	"ama/api/interfaces"
 	"ama/api/logging"
 	"net/http"
+	"strings"
 )
 
 func PutUserListById(c interfaces.APIContext, db interfaces.ListUpdater) {
@@ -16,7 +17,7 @@ func PutUserListById(c interfaces.APIContext, db interfaces.ListUpdater) {
 	userId := c.Param(constants.UserIdPathIdentifier)
 	listId := c.Param(constants.ListIdPathIdentifier)
 
-	if userId == "" || listId == "" {
+	if strings.TrimSpace(userId) == "" || strings.TrimSpace(listId) == "" {
 		logger.Error("blank userId or listId",
 			constants.UserIdPathIdentifier, userId,
 			constants.ListIdPathIdentifier, listId,

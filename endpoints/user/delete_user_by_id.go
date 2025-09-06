@@ -6,12 +6,19 @@ import (
 	"ama/api/interfaces"
 	"ama/api/logging"
 	"net/http"
+	"strings"
 )
 
 // Delete a user from the database given their user id
 func DeleteUserById(c interfaces.APIContext, deleter interfaces.UserDeleter) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)
+	if strings.TrimSpace(userId) == "" {
+		msg := "cannot have blank user id"
+		logger.Error(msg, "error", msg, constants.UserIdPathIdentifier, userId)
+		c.IndentedJSON(http.StatusBadRequest, responses.NewError(msg))
+		return
+	}
 	deleteTime, err := deleter.DeleteUser(userId)
 	if err != nil {
 		msg := "error deleting user"

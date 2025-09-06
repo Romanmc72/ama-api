@@ -1,6 +1,7 @@
 package user
 
 import (
+	"ama/api/application/list"
 	"errors"
 	"slices"
 	"strings"
@@ -10,6 +11,25 @@ func ValidateUser(user BaseUser) error {
 	errorList := make([]string, 0)
 	if len(user.Lists) == 0 {
 		errorList = append(errorList, `user "lists" field is required and cannot be empty`)
+	}
+	hasLikedQuestions := false
+	likeQuestionLists := 0
+	listMap := map[string]bool{}
+	for _, l := range user.Lists {
+		listMap[l.ID] = true
+		if l.Name == list.LikedQuestionsListName {
+			hasLikedQuestions = true
+			likeQuestionLists += 1
+		}
+	}
+	if !hasLikedQuestions {
+		errorList = append(errorList, "missing '"+list.LikedQuestionsListName+"' List")
+	}
+	if likeQuestionLists > 1 {
+		errorList = append(errorList, "can only have 1 '"+list.LikedQuestionsListName+"' List")
+	}
+	if len(listMap) < len(user.Lists) {
+		errorList = append(errorList, "there are lists with duplicate IDs")
 	}
 	emailParts := strings.Split(user.Email, "@")
 	if len(user.Email) < 6 || len(emailParts) != 2 || len(emailParts[0]) == 0 || len(emailParts[1]) < 4 || !strings.Contains(emailParts[1], ".") {

@@ -142,6 +142,54 @@ func TestUpdateList(t *testing.T) {
 			list:    &fixtures.ValidLists[0],
 			wantErr: true,
 		},
+		// TODO: Get these to run in the transactions
+		// {
+		// 	name:    "Failure Adding Another Liked Questions List",
+		// 	db:      database.ManualTestConnect(
+		// 		t.Context(),
+		// 		test.NewMockDatabase(&test.MockDBConfig{
+		// 			Collections: map[string]test.MockCollectionConfig{
+		// 				constants.UserCollection: {
+		// 					Documents: map[string]test.MockDocumentConfig{
+		// 						fixtures.UserId: {
+		// 							Data:   fixtures.ValidBaseUser,
+		// 							ID:     fixtures.UserId,
+		// 						},
+		// 					},
+		// 				},
+		// 			},
+		// 		}),
+		// 		logger,
+		// 	),
+		// 	userId:  fixtures.UserId,
+		// 	list:    &fixtures.ValidLists[1],
+		// 	wantErr: true,
+		// },
+		// {
+		// 	name:    "Failure Replacing Liked Questions List",
+		// 	db:      database.ManualTestConnect(
+		// 		t.Context(),
+		// 		test.NewMockDatabase(&test.MockDBConfig{
+		// 			Collections: map[string]test.MockCollectionConfig{
+		// 				constants.UserCollection: {
+		// 					Documents: map[string]test.MockDocumentConfig{
+		// 						fixtures.UserId: {
+		// 							Data:   fixtures.ValidBaseUser,
+		// 							ID:     fixtures.UserId,
+		// 						},
+		// 					},
+		// 				},
+		// 			},
+		// 		}),
+		// 		logger,
+		// 	),
+		// 	userId:  fixtures.UserId,
+		// 	list:    &list.List{
+		// 		ID: fixtures.NewId,
+		// 		Name: "Replacing Liked Questions",
+		// 	},
+		// 	wantErr: true,
+		// },
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

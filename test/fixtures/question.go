@@ -24,3 +24,8 @@ var ValidQuestion = application.Question{
 	Prompt: prompt,
 	Tags:   Tags,
 }
+
+var InvalidNewQuestion = application.NewQuestion{
+	Prompt: "",
+	Tags:   nil,
+}

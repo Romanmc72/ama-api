@@ -17,6 +17,7 @@ import (
 
 func TestPostQuestion(t *testing.T) {
 	qBytes, _ := json.Marshal(fixtures.ValidNewQuestion)
+	invalidQBytes, _ := json.Marshal(fixtures.InvalidNewQuestion)
 	testCases := []struct {
 		name     string
 		db       test.MockQuestionManager
@@ -41,10 +42,19 @@ func TestPostQuestion(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Failure - Bad Request",
+			name: "Failure - Bad Request Invalid JSON",
 			db:   *test.NewMockQuestionManager(test.MockQuestionManagerConfig{}),
 			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
 				InputJSON: []byte(`{"prompt": [1,2,3,4], "tags": "you are it"}`),
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
+		},
+		{
+			name: "Failure - Bad Request Invalid Input Data",
+			db:   *test.NewMockQuestionManager(test.MockQuestionManagerConfig{}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: invalidQBytes,
 			}),
 			wantCode: http.StatusBadRequest,
 			wantErr:  true,

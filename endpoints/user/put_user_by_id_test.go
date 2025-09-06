@@ -1,7 +1,9 @@
 package user_test
 
 import (
+	"ama/api/application/list"
 	"ama/api/application/responses"
+	appUser "ama/api/application/user"
 	"ama/api/constants"
 	"ama/api/endpoints/user"
 	"ama/api/interfaces"
@@ -11,10 +13,29 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestPutUserById(t *testing.T) {
 	validUserBytes, _ := json.Marshal(fixtures.ValidBaseUser)
+	invalidUserBytes, _ := json.Marshal(appUser.BaseUser{
+		Name:       "test",
+		Email:      "invalid email",
+		FirebaseID: "",
+		Settings: appUser.UserSettings{
+			ColorScheme: appUser.UserColorScheme{
+				Background:            "invalid input",
+				Foreground:            "invalid input",
+				HighlightedBackground: "invalid input",
+				HighlightedForeground: "invalid input",
+			},
+		},
+		Subscription: appUser.UserSubscription{
+			RenewalDate: time.Now().AddDate(-1, 0, 0),
+			PayCadence:  "invalid",
+		},
+		Lists: []list.List{},
+	})
 	testCases := []struct {
 		name     string
 		db       interfaces.UserWriter
@@ -35,10 +56,33 @@ func TestPutUserById(t *testing.T) {
 			wantErr:  false,
 		},
 		{
+			name: "Failure - Blank UserId",
+			db:   &test.MockUserManager{},
+			ctx: test.NewMockAPIContext(test.MockAPIContextConfig{
+				Params: map[string]string{
+					constants.UserIdPathIdentifier: "    ",
+				},
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
+		},
+		{
 			name: "Failure - Input JSON Bind Error",
 			db:   &test.MockUserManager{},
 			ctx: test.NewMockAPIContext(test.MockAPIContextConfig{
 				InputJSON: []byte(`{"firebaseId": 69, "name": {"fruit": "banana"}}`),
+				Params: map[string]string{
+					constants.UserIdPathIdentifier: fixtures.UserId,
+				},
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
+		},
+		{
+			name: "Failure - Invalid Input Error",
+			db:   &test.MockUserManager{},
+			ctx: test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: invalidUserBytes,
 				Params: map[string]string{
 					constants.UserIdPathIdentifier: fixtures.UserId,
 				},

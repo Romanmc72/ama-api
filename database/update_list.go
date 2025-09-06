@@ -40,6 +40,14 @@ func (db *Database) UpdateList(userId string, updatedList list.List) error {
 		if existingList == nil {
 			return errors.New("list not for user found")
 		}
+		if err := list.ValidateList(*existingList); err != nil {
+			db.logger.Error("This list cannot be changed", "error", err, "user", userId, "list", existingList)
+			return err
+		}
+		if err := list.ValidateList(updatedList); err != nil {
+			db.logger.Error("This updated list is invalid", "error", err, "user", userId, "list", updatedList)
+			return err
+		}
 		return tx.Set(userDocRef.Ref(), user)
 	})
 }

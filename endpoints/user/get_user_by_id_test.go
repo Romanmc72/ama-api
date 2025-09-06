@@ -37,6 +37,17 @@ func TestGetUserById(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "Failure - Blank userId",
+			db:   *test.NewMockUserManager(test.MockUserManagerConfig{}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				Params: map[string]string{
+					constants.UserIdPathIdentifier: "   ",
+				},
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
+		},
+		{
 			name: "Failure - Not Found",
 			db: *test.NewMockUserManager(test.MockUserManagerConfig{
 				ReadUser: func(id string) (application.User, error) {

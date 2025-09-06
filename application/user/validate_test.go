@@ -44,12 +44,71 @@ func TestValidateUser(t *testing.T) {
 			valid: false,
 		},
 		{
-			name: "Invalid Lists",
+			name: "Invalid Lists - None",
 			user: user.BaseUser{
 				FirebaseID:   "firebase123",
 				Email:        "test@test.com",
 				Tier:         user.FreeTier,
 				Lists:        []list.List{},
+				Subscription: fixtures.ValidUserSubscription,
+				Settings:     fixtures.ValidUserSettings,
+			},
+			valid: false,
+		},
+		{
+			name: "Invalid Lists - Missing Liked Questions",
+			user: user.BaseUser{
+				FirebaseID: "firebase123",
+				Email:      "test@test.com",
+				Tier:       user.FreeTier,
+				Lists: []list.List{
+					{
+						ID:   "abcd",
+						Name: "abcd",
+					},
+				},
+				Subscription: fixtures.ValidUserSubscription,
+				Settings:     fixtures.ValidUserSettings,
+			},
+			valid: false,
+		},
+		{
+			name: "Invalid Lists - Multiple Liked Questions",
+			user: user.BaseUser{
+				FirebaseID: "firebase123",
+				Email:      "test@test.com",
+				Tier:       user.FreeTier,
+				Lists: []list.List{
+					{
+						ID:   "abcd",
+						Name: list.LikedQuestionsListName,
+					},
+					{
+						ID:   "abcdefgh",
+						Name: list.LikedQuestionsListName,
+					},
+				},
+				Subscription: fixtures.ValidUserSubscription,
+				Settings:     fixtures.ValidUserSettings,
+			},
+			valid: false,
+		},
+		{
+			name: "Invalid Lists - Duplicate List IDs",
+			user: user.BaseUser{
+				FirebaseID: "firebase123",
+				Email:      "test@test.com",
+				Tier:       user.FreeTier,
+				Lists: []list.List{
+					{
+						ID:   "abcd",
+						Name: "abcd",
+					},
+					{
+						ID:   "abcd",
+						Name: list.LikedQuestionsListName,
+					},
+				},
 				Subscription: fixtures.ValidUserSubscription,
 				Settings:     fixtures.ValidUserSettings,
 			},

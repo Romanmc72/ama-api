@@ -19,6 +19,13 @@ func PostQuestion(c interfaces.APIContext, db interfaces.QuestionWriter) {
 		logger.Error("Invalid input data provided of", "body", c.GetString("body"), "error", err)
 		return
 	}
+
+	if err := application.ValidateQuestion(newQuestion.Question("")); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, responses.NewError(err.Error()))
+		logger.Error("Invalid input data provided of", "body", newQuestion, "error", err)
+		return
+	}
+
 	question, err := db.CreateQuestion(&newQuestion)
 	if err != nil {
 		c.IndentedJSON(

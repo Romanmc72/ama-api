@@ -1,5 +1,10 @@
 package list
 
+import (
+	"errors"
+	"strings"
+)
+
 const LikedQuestionsListName = "Liked questions"
 
 // A list of questions
@@ -15,4 +20,21 @@ func (l *List) String() string {
 		"Id=" + l.ID +
 		", Name=" + l.Name +
 		")"
+}
+
+func ValidateList(l List) error {
+	errs := []string{}
+	if strings.TrimSpace(l.ID) == "" {
+		errs = append(errs, "ID cannot be blank")
+	}
+	if strings.TrimSpace(l.Name) == "" {
+		errs = append(errs, "Name cannot be blank")
+	}
+	if strings.TrimSpace(l.Name) == LikedQuestionsListName {
+		errs = append(errs, `Cannot have 2 "`+LikedQuestionsListName+`" list names`)
+	}
+	if len(errs) != 0 {
+		return errors.New(strings.Join(errs, "; "))
+	}
+	return nil
 }
