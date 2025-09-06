@@ -3,154 +3,73 @@ package test
 import (
 	"ama/api/application"
 	"ama/api/interfaces"
-	"errors"
 	"time"
 )
 
 // MockQuestionManager implements QuestionManager interface for testing
 type MockQuestionManager struct {
-	// Store questions for simulating database
-	questions map[string]application.Question
+	MockCreateQuestion func(questionData interfaces.QuestionConverter) (application.Question, error)
+	MockReadQuestion   func(id string) (application.Question, error)
+	MockReadQuestions  func(limit int, finalId string, tags []string) ([]application.Question, error)
+	MockUpdateQuestion func(id string, questionData interfaces.QuestionConverter) (application.Question, error)
+	MockDeleteQuestion func(id string) (time.Time, error)
+}
 
-	// Track method calls for verification in tests
-	CreateQuestionCalls []interfaces.QuestionConverter
-	UpdateQuestionCalls map[string]interfaces.QuestionConverter
-	ReadQuestionCalls   []string
-	DeleteQuestionCalls []string
-
-	// Control mock behavior
-	ShouldError bool
+type MockQuestionManagerConfig struct {
+	CreateQuestion func(questionData interfaces.QuestionConverter) (application.Question, error)
+	ReadQuestion   func(id string) (application.Question, error)
+	ReadQuestions  func(limit int, finalId string, tags []string) ([]application.Question, error)
+	UpdateQuestion func(id string, questionData interfaces.QuestionConverter) (application.Question, error)
+	DeleteQuestion func(id string) (time.Time, error)
 }
 
 // NewMockQuestionManager creates a new instance of MockQuestionManager
-func NewMockQuestionManager() *MockQuestionManager {
+func NewMockQuestionManager(cfg MockQuestionManagerConfig) *MockQuestionManager {
 	return &MockQuestionManager{
-		questions:           make(map[string]application.Question),
-		UpdateQuestionCalls: make(map[string]interfaces.QuestionConverter),
+		MockCreateQuestion: cfg.CreateQuestion,
+		MockReadQuestion:   cfg.ReadQuestion,
+		MockReadQuestions:  cfg.ReadQuestions,
+		MockUpdateQuestion: cfg.UpdateQuestion,
+		MockDeleteQuestion: cfg.DeleteQuestion,
 	}
 }
 
 // CreateQuestion implements QuestionWriter interface
 func (m *MockQuestionManager) CreateQuestion(questionData interfaces.QuestionConverter) (application.Question, error) {
-	if m.ShouldError {
-		return application.Question{}, errors.New("mock error")
+	if m.MockCreateQuestion != nil {
+		return m.MockCreateQuestion(questionData)
 	}
-
-	m.CreateQuestionCalls = append(m.CreateQuestionCalls, questionData)
-	question := questionData.Question("")
-	m.questions[question.ID] = question
-	return question, nil
+	return application.Question{}, nil
 }
 
 // UpdateQuestion implements QuestionWriter interface
 func (m *MockQuestionManager) UpdateQuestion(id string, questionData interfaces.QuestionConverter) (application.Question, error) {
-	if m.ShouldError {
-		return application.Question{}, errors.New("mock error")
+	if m.MockUpdateQuestion != nil {
+		return m.MockUpdateQuestion(id, questionData)
 	}
-
-	m.UpdateQuestionCalls[id] = questionData
-	question := questionData.Question(id)
-	m.questions[id] = question
-	return question, nil
+	return application.Question{}, nil
 }
 
 // ReadQuestion implements QuestionReader interface
 func (m *MockQuestionManager) ReadQuestion(id string) (application.Question, error) {
-	if m.ShouldError {
-		return application.Question{}, errors.New("mock error")
+	if m.MockReadQuestion != nil {
+		return m.MockReadQuestion(id)
 	}
-
-	m.ReadQuestionCalls = append(m.ReadQuestionCalls, id)
-	question, exists := m.questions[id]
-	if !exists {
-		return application.Question{}, nil
-	}
-	return question, nil
+	return application.Question{}, nil
 }
 
 // ReadQuestions implements QuestionReader interface
 func (m *MockQuestionManager) ReadQuestions(limit int, finalId string, tags []string) ([]application.Question, error) {
-	if m.ShouldError {
-		return nil, errors.New("mock error")
+	if m.MockReadQuestions != nil {
+		return m.MockReadQuestions(limit, finalId, tags)
 	}
-
-	// Convert map to slice and apply filters
-	var result []application.Question
-	for _, q := range m.questions {
-		// Apply tags filter if specified
-		if len(tags) > 0 {
-			matched := false
-			for _, tag := range tags {
-				for _, qTag := range q.Tags {
-					if tag == qTag {
-						matched = true
-						break
-					}
-				}
-				if matched {
-					break
-				}
-			}
-			if !matched {
-				continue
-			}
-		}
-		result = append(result, q)
-	}
-
-	// Apply finalId filter
-	if finalId != "" {
-		filtered := []application.Question{}
-		for _, q := range result {
-			if q.ID > finalId {
-				filtered = append(filtered, q)
-			}
-		}
-		result = filtered
-	}
-
-	// Apply limit
-	if len(result) > limit {
-		result = result[:limit]
-	}
-
-	return result, nil
+	return []application.Question{}, nil
 }
 
 // DeleteQuestion implements QuestionDeleter interface
 func (m *MockQuestionManager) DeleteQuestion(id string) (time.Time, error) {
-	if m.ShouldError {
-		return time.Time{}, errors.New("mock error")
+	if m.MockDeleteQuestion != nil {
+		return m.MockDeleteQuestion(id)
 	}
-
-	m.DeleteQuestionCalls = append(m.DeleteQuestionCalls, id)
-	delete(m.questions, id)
 	return time.Now(), nil
-}
-
-// Helper methods for test setup and verification
-
-// SetQuestion adds a question to the mock database
-func (m *MockQuestionManager) SetQuestion(question application.Question) {
-	m.questions[question.ID] = question
-}
-
-// GetCreateQuestionCalls returns the number of times CreateQuestion was called
-func (m *MockQuestionManager) GetCreateQuestionCalls() int {
-	return len(m.CreateQuestionCalls)
-}
-
-// GetUpdateQuestionCalls returns the number of times UpdateQuestion was called
-func (m *MockQuestionManager) GetUpdateQuestionCalls() int {
-	return len(m.UpdateQuestionCalls)
-}
-
-// GetReadQuestionCalls returns the number of times ReadQuestion was called
-func (m *MockQuestionManager) GetReadQuestionCalls() int {
-	return len(m.ReadQuestionCalls)
-}
-
-// GetDeleteQuestionCalls returns the number of times DeleteQuestion was called
-func (m *MockQuestionManager) GetDeleteQuestionCalls() int {
-	return len(m.DeleteQuestionCalls)
 }

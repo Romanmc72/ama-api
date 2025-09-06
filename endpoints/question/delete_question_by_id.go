@@ -15,6 +15,7 @@ func DeleteQuestionById(c interfaces.APIContext, db interfaces.QuestionDeleter) 
 	id := c.Param(constants.QuestionIdPathIdentifier)
 	deleteTime, err := db.DeleteQuestion(id)
 	if err != nil {
+		logger.Error("Unable to delete question", "error", err, "questionId", id)
 		c.IndentedJSON(
 			http.StatusInternalServerError,
 			responses.NewError("Something went wrong trying to delete that document"),

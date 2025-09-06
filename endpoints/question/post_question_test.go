@@ -1,83 +1,82 @@
-package question
+package question_test
 
 import (
 	"ama/api/application"
 	"ama/api/application/responses"
+	"ama/api/constants"
+	"ama/api/endpoints/question"
+	"ama/api/interfaces"
 	"ama/api/test"
+	"ama/api/test/fixtures"
+	"encoding/json"
+	"errors"
 	"net/http"
+	"reflect"
 	"testing"
 )
 
 func TestPostQuestion(t *testing.T) {
-	testQuestionId := ""
-	testNewQuestion := []byte(`{"prompt": "test question", "tags": ["test"]}`)
-	tests := []struct {
-		name              string
-		inputBody         []byte
-		dbShouldFail      bool
-		expectedCode      int
-		expectedError     bool
-		expectedData      application.Question
-		expectedErrorData responses.ErrorResponse
+	qBytes, _ := json.Marshal(fixtures.ValidNewQuestion)
+	testCases := []struct {
+		name     string
+		db       test.MockQuestionManager
+		ctx      test.MockAPIContext
+		wantCode int
+		wantErr  bool
 	}{
 		{
-			name:          "Success case",
-			inputBody:     testNewQuestion,
-			dbShouldFail:  false,
-			expectedCode:  http.StatusCreated,
-			expectedError: false,
-			// TODO: Get this to work with the test
-			expectedData: application.Question{
-				ID:     testQuestionId,
-				Prompt: "test question",
-				Tags:   []string{"test"},
-			},
-			expectedErrorData: responses.ErrorResponse{},
+			name:     "Success",
+			wantCode: http.StatusCreated,
+			db: *test.NewMockQuestionManager(test.MockQuestionManagerConfig{
+				CreateQuestion: func(questionData interfaces.QuestionConverter) (application.Question, error) {
+					return fixtures.ValidQuestion, nil
+				},
+			}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: qBytes,
+				Params: map[string]string{
+					constants.QuestionIdPathIdentifier: fixtures.QuestionId,
+				},
+			}),
+			wantErr: false,
 		},
 		{
-			name:              "Invalid JSON",
-			inputBody:         []byte(`{"invalid": "input"}`),
-			dbShouldFail:      false,
-			expectedCode:      http.StatusBadRequest,
-			expectedError:     true,
-			expectedData:      application.Question{},
-			expectedErrorData: responses.NewError("invalid data"),
+			name: "Failure - Bad Request",
+			db:   *test.NewMockQuestionManager(test.MockQuestionManagerConfig{}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: []byte(`{"prompt": [1,2,3,4], "tags": "you are it"}`),
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
 		},
 		{
-			name:              "Database error",
-			inputBody:         testNewQuestion,
-			dbShouldFail:      true,
-			expectedCode:      http.StatusInternalServerError,
-			expectedError:     true,
-			expectedData:      application.Question{},
-			expectedErrorData: responses.NewError("encountered an error writing that data"),
+			name: "Failure - Internal Server Error",
+			db: *test.NewMockQuestionManager(test.MockQuestionManagerConfig{
+				CreateQuestion: func(questionData interfaces.QuestionConverter) (application.Question, error) {
+					return application.Question{}, errors.New("could not create")
+				},
+			}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: qBytes,
+				Params: map[string]string{
+					constants.QuestionIdPathIdentifier: fixtures.QuestionId,
+				},
+			}),
+			wantCode: http.StatusInternalServerError,
+			wantErr:  true,
 		},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			mockCtx := test.NewMockAPIContext(test.MockAPIContextConfig{
-				InputJSON: tt.inputBody,
-			})
-			mockDB := test.NewMockQuestionManager()
-			mockDB.ShouldError = tt.dbShouldFail
-
-			PostQuestion(mockCtx, mockDB)
-
-			if mockCtx.ResponseCode != tt.expectedCode {
-				t.Errorf("Expected status code %d, got %d", tt.expectedCode, mockCtx.ResponseCode)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			question.PostQuestion(&tc.ctx, &tc.db)
+			if tc.wantCode != tc.ctx.ResponseCode {
+				t.Errorf("PostQuestion() wanted Code = %d; got = %d", tc.wantCode, tc.ctx.ResponseCode)
 			}
-
-			if tt.expectedError {
-				if _, ok := mockCtx.ResponseData.(responses.ErrorResponse); !ok {
-					t.Errorf("Expected error response, got something else %v", mockCtx.ResponseData)
-				}
-			} else {
-				if question, ok := mockCtx.ResponseData.(application.Question); !ok {
-					t.Errorf("Expected question response, got something else, %v", mockCtx.ResponseData)
-				} else if question.ID != testQuestionId || question.Prompt != tt.expectedData.Prompt {
-					t.Errorf("Expected question ID to be %s and prompt to be %s, got ID %s and prompt %s", testQuestionId, tt.expectedData.Prompt, question.ID, question.Prompt)
-				}
+			if _, ok := tc.ctx.ResponseData.(responses.ErrorResponse); tc.wantErr && !ok {
+				t.Errorf("PostQuestion() wanted error, got %v", tc.ctx.ResponseData)
+			}
+			if q, ok := tc.ctx.ResponseData.(application.Question); !tc.wantErr && (!ok || !reflect.DeepEqual(q, fixtures.ValidQuestion)) {
+				t.Errorf("PostQuestion() wanted %v, got %v", fixtures.ValidQuestion, tc.ctx.ResponseData)
 			}
 		})
 	}

@@ -1,13 +1,21 @@
 package user_test
 
 import (
+	"ama/api/application"
 	"ama/api/application/responses"
+	appUser "ama/api/application/user"
 	"ama/api/endpoints/user"
 	"ama/api/test"
+	"ama/api/test/fixtures"
+	"encoding/json"
+	"errors"
+	"net/http"
+	"reflect"
 	"testing"
 )
 
 func TestPostUser(t *testing.T) {
+	validUserBytes, _ := json.Marshal(fixtures.ValidUser.BaseUser)
 	testCases := []struct {
 		name     string
 		db       test.MockUserManager
@@ -15,21 +23,41 @@ func TestPostUser(t *testing.T) {
 		wantCode int
 		wantErr  bool
 	}{
-		// {
-		// 	name: "Success",
-		// 	wantCode: http.StatusCreated,
-		// 	wantErr: false,
-		// },
-		// {
-		// 	name: "Failure - Bad Request",
-		// 	wantCode: http.StatusBadRequest,
-		// 	wantErr: true,
-		// },
-		// {
-		// 	name: "Failure - Internal Server Error",
-		// 	wantCode: http.StatusInternalServerError,
-		// 	wantErr: true,
-		// },
+		{
+			name:     "Success",
+			wantCode: http.StatusCreated,
+			db: *test.NewMockUserManager(test.MockUserManagerConfig{
+				CreateUser: func(userData appUser.BaseUser) (application.User, error) {
+					return fixtures.ValidUser, nil
+				},
+			}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: validUserBytes,
+			}),
+			wantErr: false,
+		},
+		{
+			name: "Failure - Bad Request",
+			db:   *test.NewMockUserManager(test.MockUserManagerConfig{}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: []byte(`{"settings": "invalid input data"`),
+			}),
+			wantCode: http.StatusBadRequest,
+			wantErr:  true,
+		},
+		{
+			name:     "Failure - Internal Server Error",
+			wantCode: http.StatusInternalServerError,
+			db: *test.NewMockUserManager(test.MockUserManagerConfig{
+				CreateUser: func(userData appUser.BaseUser) (application.User, error) {
+					return application.User{}, errors.New("create error")
+				},
+			}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: validUserBytes,
+			}),
+			wantErr: true,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -39,6 +67,9 @@ func TestPostUser(t *testing.T) {
 			}
 			if _, ok := tc.ctx.ResponseData.(responses.ErrorResponse); tc.wantErr && !ok {
 				t.Errorf("PostUser() wanted error, got %v", tc.ctx.ResponseData)
+			}
+			if u, ok := tc.ctx.ResponseData.(application.User); !tc.wantErr && (!ok || !reflect.DeepEqual(u, fixtures.ValidUser)) {
+				t.Errorf("PostUser() wanted %v, got %v", fixtures.ValidUser, tc.ctx.ResponseData)
 			}
 		})
 	}

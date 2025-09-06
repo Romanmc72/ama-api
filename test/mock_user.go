@@ -21,13 +21,21 @@ type MockUserConfig struct {
 }
 
 type MockUserManagerConfig struct {
-	Users map[string]MockUserConfig
+	Users      map[string]MockUserConfig
+	CreateUser func(userData user.BaseUser) (application.User, error)
+	ReadUser   func(id string) (application.User, error)
+	UpdateUser func(userData interfaces.UserConverter) error
+	DeleteUser func(id string) (time.Time, error)
 }
 
 // NewMockUserManager creates a new instance of MockUserManager
 func NewMockUserManager(cfg MockUserManagerConfig) *MockUserManager {
 	return &MockUserManager{
-		Users: cfg.Users,
+		Users:          cfg.Users,
+		MockCreateUser: cfg.CreateUser,
+		MockReadUser:   cfg.ReadUser,
+		MockUpdateUser: cfg.UpdateUser,
+		MockDeleteUser: cfg.DeleteUser,
 	}
 }
 

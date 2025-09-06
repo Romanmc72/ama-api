@@ -25,7 +25,7 @@ func PutQuestionById(c interfaces.APIContext, db interfaces.QuestionWriter) {
 
 	updatedQuestion, err := db.UpdateQuestion(id, &newQuestion)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, responses.NewError("unable to update question"))
+		c.IndentedJSON(http.StatusInternalServerError, responses.NewError("unable to update question"))
 		logger.Error("Update failed", "question", newQuestion, "error", err)
 		return
 	}
