@@ -7,7 +7,11 @@ import (
 
 const ListName = "List 1"
 
-var ValidListRequest = requests.PutListRequest{
+var ValidPostListRequest = requests.PostUserListRequest{
+	Name: ListName,
+}
+
+var ValidPutUserListRequest = requests.PutUserListRequest{
 	Name: ListName,
 }
 

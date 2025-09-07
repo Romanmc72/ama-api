@@ -13,9 +13,9 @@ import (
 // TODO This still created a list with a blank id
 // "Creates" a list for a given user, without a question in that list, the list does not "exist" per se
 // but it is a placeholder for the user to add questions to it
-func (db *Database) CreateList(userId string, l list.List) error {
+func (db *Database) CreateList(userId string, l list.List) (list.List, error) {
 	if strings.Trim(userId, " ") == "" {
-		return errors.New("user id cannot be empty")
+		return list.List{}, errors.New("user id cannot be empty")
 	}
 	user, err := db.ReadUser(userId)
 	if err != nil {
@@ -24,7 +24,7 @@ func (db *Database) CreateList(userId string, l list.List) error {
 			"error", err,
 			"userId", userId,
 		)
-		return err
+		return list.List{}, err
 	}
 	if l.ID == "" {
 		l.ID = db.client.NewID()
@@ -33,6 +33,14 @@ func (db *Database) CreateList(userId string, l list.List) error {
 			"list", l,
 			"userId", userId,
 		)
+	}
+	if err := list.ValidateList(l); err != nil {
+		db.logger.Error(
+			"List invalid",
+			"list", l,
+			"userId", userId,
+		)
+		return list.List{}, err
 	}
 	db.logger.Debug(
 		"Checking if list already exists",
@@ -50,7 +58,7 @@ func (db *Database) CreateList(userId string, l list.List) error {
 			"listId", l.ID,
 			"userId", userId,
 		)
-		return err
+		return list.List{}, err
 	}
 	if exists {
 		db.logger.Debug(
@@ -72,11 +80,15 @@ func (db *Database) CreateList(userId string, l list.List) error {
 				"listId", l.ID,
 				"userId", userId,
 			)
-			return nil
+			return list.List{}, nil
 		}
 	}
 	user.Lists = append(user.Lists, l)
-	return db.UpdateUser(user)
+	err = db.UpdateUser(user)
+	if err != nil {
+		return list.List{}, err
+	}
+	return l, err
 }
 
 func (db *Database) checkIfListExists(userDocRef interfaces.DocumentRef, listId string) (bool, error) {

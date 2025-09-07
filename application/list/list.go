@@ -1,7 +1,7 @@
 package list
 
 import (
-	"errors"
+	"ama/api/application/errors"
 	"strings"
 )
 
@@ -22,6 +22,7 @@ func (l *List) String() string {
 		")"
 }
 
+// Ensures that a list's data is valid
 func ValidateList(l List) error {
 	errs := []string{}
 	if strings.TrimSpace(l.ID) == "" {
@@ -34,7 +35,7 @@ func ValidateList(l List) error {
 		errs = append(errs, `Cannot have 2 "`+LikedQuestionsListName+`" list names`)
 	}
 	if len(errs) != 0 {
-		return errors.New(strings.Join(errs, "; "))
+		return errors.NewValidationError(errs)
 	}
 	return nil
 }

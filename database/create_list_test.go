@@ -132,6 +132,28 @@ func TestCreateList(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:   "Invalid List",
+			l:      list.List{Name: "  "},
+			userId: fixtures.UserId,
+			db: database.ManualTestConnect(
+				t.Context(),
+				test.NewMockDatabase(&test.MockDBConfig{
+					Collections: map[string]test.MockCollectionConfig{
+						constants.UserCollection: {
+							Documents: map[string]test.MockDocumentConfig{
+								fixtures.UserId: {
+									ID:   fixtures.UserId,
+									Data: fixtures.ValidBaseUser,
+								},
+							},
+						},
+					},
+				}),
+				logger,
+			),
+			wantErr: true,
+		},
+		{
 			name:   "Read Error",
 			l:      list.List{Name: testListName},
 			userId: fixtures.UserId,
@@ -187,10 +209,33 @@ func TestCreateList(t *testing.T) {
 			),
 			wantErr: true,
 		},
+		{
+			name:   "UpdateUser Error",
+			l:      list.List{ID: "fester-fiesta", Name: testListName},
+			userId: fixtures.UserId,
+			db: database.ManualTestConnect(
+				t.Context(),
+				test.NewMockDatabase(&test.MockDBConfig{
+					Collections: map[string]test.MockCollectionConfig{
+						constants.UserCollection: {
+							Documents: map[string]test.MockDocumentConfig{
+								fixtures.UserId: {
+									ID:     fixtures.UserId,
+									Data:   fixtures.ValidBaseUser,
+									SetErr: errors.New("could not write user"),
+								},
+							},
+						},
+					},
+				}),
+				logger,
+			),
+			wantErr: true,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := tc.db.CreateList(tc.userId, tc.l)
+			_, err := tc.db.CreateList(tc.userId, tc.l)
 			if (err != nil) != tc.wantErr {
 				t.Errorf("CreateList() wantedErr = %v; got = %v", tc.wantErr, err)
 			}

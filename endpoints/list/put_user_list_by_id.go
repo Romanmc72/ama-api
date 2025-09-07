@@ -27,7 +27,7 @@ func PutUserListById(c interfaces.APIContext, db interfaces.ListUpdater) {
 		return
 	}
 
-	var listReq requests.PutListRequest
+	var listReq requests.PutUserListRequest
 	if err := c.BindJSON(&listReq); err != nil {
 		logger.Error("unable to bind request body",
 			constants.UserIdPathIdentifier, userId,

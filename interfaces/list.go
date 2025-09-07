@@ -10,7 +10,7 @@ type ListReader interface {
 }
 
 type ListCreator interface {
-	CreateList(userId string, list list.List) error
+	CreateList(userId string, list list.List) (list.List, error)
 }
 
 type ListUpdater interface {

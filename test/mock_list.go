@@ -9,7 +9,7 @@ type MockListManager struct {
 	MockReadQuestion           func(id string) (application.Question, error)
 	MockReadQuestions          func(limit int, finalId string, tags []string) ([]application.Question, error)
 	MockReadList               func(userId string, listId string, limit int, finalId string, tags []string) (list.List, []application.Question, error)
-	MockCreateList             func(userId string, list list.List) error
+	MockCreateList             func(userId string, list list.List) (list.List, error)
 	MockAddQuestionToList      func(userId string, listId string, question application.Question) error
 	MockRemoveQuestionFromList func(userId string, listId string, questionId string) error
 	MockUpdateList             func(userId string, updatedList list.List) error
@@ -20,7 +20,7 @@ type MockListManagerConfig struct {
 	ReadQuestion           func(id string) (application.Question, error)
 	ReadQuestions          func(limit int, finalId string, tags []string) ([]application.Question, error)
 	ReadList               func(userId string, listId string, limit int, finalId string, tags []string) (list.List, []application.Question, error)
-	CreateList             func(userId string, list list.List) error
+	CreateList             func(userId string, list list.List) (list.List, error)
 	AddQuestionToList      func(userId string, listId string, question application.Question) error
 	RemoveQuestionFromList func(userId string, listId string, questionId string) error
 	UpdateList             func(userId string, updatedList list.List) error
@@ -61,11 +61,11 @@ func (m *MockListManager) ReadList(userId string, listId string, limit int, fina
 	return list.List{}, []application.Question{}, nil
 }
 
-func (m *MockListManager) CreateList(userId string, list list.List) error {
+func (m *MockListManager) CreateList(userId string, l list.List) (list.List, error) {
 	if m.MockCreateList != nil {
-		return m.MockCreateList(userId, list)
+		return m.MockCreateList(userId, l)
 	}
-	return nil
+	return list.List{}, nil
 }
 
 func (m *MockListManager) AddQuestionToList(userId string, listId string, question application.Question) error {

@@ -1,8 +1,8 @@
 package user
 
 import (
+	"ama/api/application/errors"
 	"ama/api/application/list"
-	"errors"
 	"slices"
 	"strings"
 )
@@ -49,7 +49,7 @@ func ValidateUser(user BaseUser) error {
 		errorList = append(errorList, err.Error())
 	}
 	if len(errorList) > 0 {
-		return errors.New("validation errors: " + strings.Join(errorList, "; "))
+		return errors.NewValidationError(errorList)
 	}
 	return nil
 }

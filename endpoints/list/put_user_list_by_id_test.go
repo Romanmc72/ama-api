@@ -14,7 +14,7 @@ import (
 )
 
 func TestPutUserListById(t *testing.T) {
-	validListBytes, _ := json.Marshal(fixtures.ValidListRequest)
+	validListBytes, _ := json.Marshal(fixtures.ValidPutUserListRequest)
 	testCases := []struct {
 		name     string
 		db       *test.MockListManager
