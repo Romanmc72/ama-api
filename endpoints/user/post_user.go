@@ -9,6 +9,8 @@ import (
 	"net/http"
 )
 
+// TODO: <<Move the read check, and the adding of the liked questions
+// list into this portion of the code, not the database implementation>>
 // Creates a new user in the database and returns that new user
 func PostUser(c interfaces.APIContext, db interfaces.UserCreator) {
 	logger := logging.GetLogger()

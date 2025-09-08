@@ -11,7 +11,6 @@ import (
 	"testing"
 )
 
-// TODO: finish these tests and get them to pass
 func TestReadQuestions(t *testing.T) {
 	logger := logging.GetLogger()
 	makeDb := func(n int, err error) database.Database {

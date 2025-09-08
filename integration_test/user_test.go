@@ -98,7 +98,7 @@ func createUser(idToken string, httpClient *http.Client, email string, name stri
 			FirebaseID: firebaseId,
 			Subscription: user.UserSubscription{
 				PayCadence:  "monthly",
-				RenewalDate: time.Now(),
+				RenewalDate: time.Now().AddDate(0, 0, 30),
 			},
 			Settings: user.UserSettings{
 				ColorScheme: user.UserColorScheme{

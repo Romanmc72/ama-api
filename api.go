@@ -44,7 +44,6 @@ func main() {
 
 	// Routes requiring the authorization header to be set
 	authorizedGroup := router.Group("/")
-	// TODO: Something is wrong here and the token is not parsing correctly
 	authorizedGroup.Use(func(c *gin.Context) { auth.VerifyToken(c, jwtVerifier, logger) })
 
 	// Question endpoints

@@ -10,7 +10,6 @@ import (
 	"cloud.google.com/go/firestore"
 )
 
-// TODO: prevent updating the name of the "Liked questions" list
 // Update the attributes of a list for a user
 func (db *Database) UpdateList(userId string, updatedList list.List) error {
 	if updatedList.ID == "" || userId == "" {

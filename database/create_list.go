@@ -11,6 +11,8 @@ import (
 )
 
 // TODO This still created a list with a blank id
+// (is this still a needed TODO?)
+
 // "Creates" a list for a given user, without a question in that list, the list does not "exist" per se
 // but it is a placeholder for the user to add questions to it
 func (db *Database) CreateList(userId string, l list.List) (list.List, error) {

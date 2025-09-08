@@ -8,7 +8,6 @@ import (
 
 // TODO remove the firestore bindings from these objects if we have database objects, otherwise remove the database objects themselves
 // TODO create a user with non-required bindings to enable updates more easily with partial user objects
-// TODO create a validation function that can validate input user objects
 
 // Describes the shape of a user profile within the application.
 type User struct {

@@ -9,7 +9,6 @@ import (
 	"cloud.google.com/go/firestore"
 )
 
-// TODO: prevent deleting the "Liked questions" list
 // Erase a list from a user in the database
 func (db *Database) DeleteList(userId string, listId string) error {
 	userDocRef := db.client.Collection(constants.UserCollection).Doc(userId)

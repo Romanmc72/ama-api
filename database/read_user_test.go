@@ -10,7 +10,6 @@ import (
 	"testing"
 )
 
-// TODO: find out why failures are not failing
 func TestReadUser(t *testing.T) {
 	logger := logging.GetLogger()
 	testCases := []struct {

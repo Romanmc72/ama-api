@@ -87,8 +87,6 @@ func TestDeleteUser(t *testing.T) {
 			),
 			wantErr: true,
 		},
-		// TODO: Revisit; Likely not covered, and will be very tedious to mock
-		// just the delete throwing an error and not the read.
 		{
 			name: "Delete User Error",
 			db: database.ManualTestConnect(
