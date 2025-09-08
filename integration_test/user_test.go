@@ -1,6 +1,7 @@
 //go:build integration
 // +build integration
 
+// TODO: find out what compiler is talking about with build flags
 package integration_test
 
 import (
@@ -108,6 +109,7 @@ func createUser(idToken string, httpClient *http.Client, email string, name stri
 					HighlightedForeground: "default",
 				},
 			},
+			// TODO: This now fails as a validation error, need to default to generating the liked question list if not present
 			Lists: []list.List{},
 		},
 	}
