@@ -15,7 +15,6 @@ import (
 	"testing"
 )
 
-// TODO: Fix this, first and last tests fail
 func TestPostUserList(t *testing.T) {
 	validListBytes, err := json.Marshal(fixtures.ValidPostListRequest)
 	if err != nil {

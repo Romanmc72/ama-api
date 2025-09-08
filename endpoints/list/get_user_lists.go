@@ -5,6 +5,7 @@ import (
 	"ama/api/constants"
 	"ama/api/interfaces"
 	"ama/api/logging"
+	"strings"
 
 	"net/http"
 )
@@ -12,7 +13,7 @@ import (
 func GetUserLists(c interfaces.APIContext, db interfaces.UserReader) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)
-	if userId == "" {
+	if strings.TrimSpace(userId) == "" {
 		logger.Error("Error reading user lists", "error", "userId is empty")
 		c.IndentedJSON(http.StatusBadRequest, responses.NewError("userId is empty"))
 		return

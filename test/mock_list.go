@@ -6,6 +6,7 @@ import (
 )
 
 type MockListManager struct {
+	MockReadUser               func(id string) (application.User, error)
 	MockReadQuestion           func(id string) (application.Question, error)
 	MockReadQuestions          func(limit int, finalId string, tags []string) ([]application.Question, error)
 	MockReadList               func(userId string, listId string, limit int, finalId string, tags []string) (list.List, []application.Question, error)
@@ -17,6 +18,7 @@ type MockListManager struct {
 }
 
 type MockListManagerConfig struct {
+	ReadUser               func(id string) (application.User, error)
 	ReadQuestion           func(id string) (application.Question, error)
 	ReadQuestions          func(limit int, finalId string, tags []string) ([]application.Question, error)
 	ReadList               func(userId string, listId string, limit int, finalId string, tags []string) (list.List, []application.Question, error)
@@ -29,6 +31,7 @@ type MockListManagerConfig struct {
 
 func NewMockListManager(cfg MockListManagerConfig) *MockListManager {
 	return &MockListManager{
+		MockReadUser:               cfg.ReadUser,
 		MockReadQuestion:           cfg.ReadQuestion,
 		MockReadQuestions:          cfg.ReadQuestions,
 		MockReadList:               cfg.ReadList,
@@ -38,6 +41,13 @@ func NewMockListManager(cfg MockListManagerConfig) *MockListManager {
 		MockUpdateList:             cfg.UpdateList,
 		MockDeleteList:             cfg.DeleteList,
 	}
+}
+
+func (m *MockListManager) ReadUser(id string) (application.User, error) {
+	if m.MockReadUser != nil {
+		return m.MockReadUser(id)
+	}
+	return application.User{}, nil
 }
 
 func (m *MockListManager) ReadQuestion(id string) (application.Question, error) {

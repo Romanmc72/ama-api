@@ -6,6 +6,7 @@ import (
 )
 
 type ListReader interface {
+	UserReader
 	ReadList(userId string, listId string, limit int, finalId string, tags []string) (list.List, []application.Question, error)
 }
 
@@ -21,6 +22,7 @@ type ListUpdater interface {
 }
 
 type ListDeleter interface {
+	UserReader
 	DeleteList(userId string, listId string) error
 }
 

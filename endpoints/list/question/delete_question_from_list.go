@@ -6,6 +6,7 @@ import (
 	"ama/api/interfaces"
 	"ama/api/logging"
 	"net/http"
+	"strings"
 )
 
 func DeleteQuestionFromList(c interfaces.APIContext, db interfaces.ListUpdater) {
@@ -13,7 +14,7 @@ func DeleteQuestionFromList(c interfaces.APIContext, db interfaces.ListUpdater) 
 	userId := c.Param(constants.UserIdPathIdentifier)
 	listId := c.Param(constants.ListIdPathIdentifier)
 	questionId := c.Param(constants.QuestionIdPathIdentifier)
-	if userId == "" || listId == "" || questionId == "" {
+	if strings.TrimSpace(userId) == "" || strings.TrimSpace(listId) == "" || strings.TrimSpace(questionId) == "" {
 		logger.Error(
 			"Missing path parameters",
 			"userId", userId,

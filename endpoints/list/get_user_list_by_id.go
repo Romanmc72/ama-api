@@ -7,6 +7,7 @@ import (
 	"ama/api/interfaces"
 	"ama/api/logging"
 	"net/http"
+	"strings"
 )
 
 func GetUserListById(c interfaces.APIContext, db interfaces.ListReader) {
@@ -15,7 +16,7 @@ func GetUserListById(c interfaces.APIContext, db interfaces.ListReader) {
 	listId := c.Param(constants.ListIdPathIdentifier)
 	limit, finalId, tags := endpoints.GetReadQuestionsParamsWithDefaults(c)
 
-	if userId == "" || listId == "" {
+	if strings.TrimSpace(userId) == "" || strings.TrimSpace(listId) == "" {
 		logger.Error("Error reading user list by ID", "error", "userId or listId is empty")
 		c.IndentedJSON(http.StatusBadRequest, responses.NewError("userId or listId is empty"))
 		return
@@ -28,7 +29,8 @@ func GetUserListById(c interfaces.APIContext, db interfaces.ListReader) {
 		return
 	}
 
-	response := responses.NewGetUserListByIdResponse(list, questions)
-
-	c.IndentedJSON(http.StatusOK, response)
+	c.IndentedJSON(
+		http.StatusOK,
+		responses.NewGetUserListByIdResponse(list, questions),
+	)
 }

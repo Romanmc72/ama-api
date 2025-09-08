@@ -6,6 +6,7 @@ import (
 	"ama/api/interfaces"
 	"ama/api/logging"
 	"net/http"
+	"strings"
 )
 
 func PostQuestionToList(c interfaces.APIContext, db interfaces.ListUpdater) {
@@ -13,14 +14,14 @@ func PostQuestionToList(c interfaces.APIContext, db interfaces.ListUpdater) {
 	userId := c.Param(constants.UserIdPathIdentifier)
 	listId := c.Param(constants.ListIdPathIdentifier)
 	questionId := c.Param(constants.QuestionIdPathIdentifier)
-	if userId == "" || listId == "" || questionId == "" {
+	if strings.TrimSpace(userId) == "" || strings.TrimSpace(listId) == "" || strings.TrimSpace(questionId) == "" {
 		logger.Error(
 			"list id, question id, or user id was blank",
 			"userId", userId,
 			"listId", listId,
 			"questionId", questionId,
 		)
-		c.IndentedJSON(http.StatusBadRequest, responses.NewError("Invalid request body"))
+		c.IndentedJSON(http.StatusBadRequest, responses.NewError("userId, listId, and questionId cannot be blank"))
 		return
 	}
 	question, err := db.ReadQuestion(questionId)
@@ -32,7 +33,7 @@ func PostQuestionToList(c interfaces.APIContext, db interfaces.ListUpdater) {
 			"listId", listId,
 			"questionId", questionId,
 		)
-		c.IndentedJSON(http.StatusBadRequest, responses.NewError("Invalid question id"))
+		c.IndentedJSON(http.StatusNotFound, responses.NewError("Invalid question id"))
 		return
 	}
 	err = db.AddQuestionToList(userId, listId, question)

@@ -27,5 +27,5 @@ var ValidQuestion = application.Question{
 
 var InvalidNewQuestion = application.NewQuestion{
 	Prompt: "",
-	Tags:   nil,
+	Tags:   []string{},
 }

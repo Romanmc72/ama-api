@@ -19,17 +19,17 @@ func Tiers() []string {
 // of the user without duplicating struct types or creating import cycles.
 type BaseUser struct {
 	// The unique user identifier from firebase.
-	FirebaseID string `json:"firebaseId" firestore:"firebaseId" binding:"required"`
+	FirebaseID string `json:"firebaseId" firestore:"firebaseId" binding:"required" validate:"required"`
 	// The user's username.
 	Name string `json:"name" firestore:"name"`
 	// The user's username.
-	Email string `json:"email" firestore:"email" binding:"required"`
+	Email string `json:"email" firestore:"email" binding:"required" validate:"required"`
 	// The user's subscription tier. One of "free" | "lite" | "premium"
-	Tier string `json:"tier" firestore:"tier" binding:"required"`
+	Tier string `json:"tier" firestore:"tier" binding:"required" validate:"required"`
 	// The user's subscription information.
-	Subscription UserSubscription `json:"subscription" firestore:"subscription"`
+	Subscription UserSubscription `json:"subscription" firestore:"subscription" binding:"required" validate:"required"`
 	// The users settings and preferences.
-	Settings UserSettings `json:"settings" firestore:"settings" binding:"required"`
+	Settings UserSettings `json:"settings" firestore:"settings" binding:"required" validate:"required"`
 	// The list of question lists that the user has created.
-	Lists []list.List `json:"lists" firestore:"lists" binding:"required"`
+	Lists []list.List `json:"lists" firestore:"lists" binding:"required" validate:"required"`
 }
