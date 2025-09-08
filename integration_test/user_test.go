@@ -1,7 +1,6 @@
 //go:build integration
 // +build integration
 
-// TODO: find out what compiler is talking about with build flags
 package integration_test
 
 import (
@@ -92,26 +91,23 @@ func createUser(idToken string, httpClient *http.Client, email string, name stri
 		return "", err
 	}
 	userReqBody := requests.PostUserRequest{
-		BaseUser: user.BaseUser{
-			Name:       name,
-			Email:      email,
-			Tier:       "free",
-			FirebaseID: firebaseId,
-			Subscription: user.UserSubscription{
-				PayCadence:  "monthly",
-				RenewalDate: time.Now().AddDate(0, 0, 30),
-			},
-			Settings: user.UserSettings{
-				ColorScheme: user.UserColorScheme{
-					Background:            "default",
-					Foreground:            "default",
-					HighlightedBackground: "default",
-					HighlightedForeground: "default",
-				},
-			},
-			// TODO: This now fails as a validation error, need to default to generating the liked question list if not present
-			Lists: []list.List{},
+		Name:       name,
+		Email:      email,
+		Tier:       "free",
+		FirebaseID: firebaseId,
+		Subscription: user.UserSubscription{
+			PayCadence:  "monthly",
+			RenewalDate: time.Now().AddDate(0, 0, 30),
 		},
+		Settings: user.UserSettings{
+			ColorScheme: user.UserColorScheme{
+				Background:            "default",
+				Foreground:            "default",
+				HighlightedBackground: "default",
+				HighlightedForeground: "default",
+			},
+		},
+		Lists: []list.List{},
 	}
 	body, err := json.Marshal(userReqBody)
 	if err != nil {

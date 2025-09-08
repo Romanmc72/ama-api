@@ -24,10 +24,7 @@ var ValidList = list.List{
 
 var ValidLists = []list.List{
 	ValidList,
-	{
-		ID:   NewId,
-		Name: list.LikedQuestionsListName,
-	},
+	list.GetLikedQuestionList(),
 }
 
 var ValidGetUserListByIdResponse = responses.NewGetUserListByIdResponse(

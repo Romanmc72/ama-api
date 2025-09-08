@@ -52,6 +52,87 @@ func TestValidateList(t *testing.T) {
 	}
 }
 
+func TestValidateListOfLists(t *testing.T) {
+	testCases := []struct {
+		name        string
+		lol         []list.List
+		hasLikeList bool
+		wantErr     bool
+	}{
+		{
+			name:        "Success",
+			lol:         fixtures.ValidLists,
+			hasLikeList: true,
+			wantErr:     false,
+		},
+		{
+			name: "Failure - Blank ID",
+			lol: []list.List{{
+				ID:   "   ",
+				Name: "something",
+			}},
+			hasLikeList: false,
+			wantErr:     true,
+		},
+		{
+			name: "Failure - Liked Questions Blank ID",
+			lol: []list.List{{
+				ID:   "     ",
+				Name: list.LikedQuestionsListName,
+			}},
+			hasLikeList: true,
+			wantErr:     true,
+		},
+		{
+			name: "Failure - Blank Name",
+			lol: []list.List{{
+				ID:   fixtures.ListId,
+				Name: "  ",
+			}},
+			hasLikeList: false,
+			wantErr:     true,
+		},
+		{
+			name: "Failure - Duplicate Liked Question List",
+			lol: []list.List{
+				{
+					ID:   fixtures.ListId,
+					Name: list.LikedQuestionsListName,
+				},
+				list.GetLikedQuestionList(),
+			},
+			hasLikeList: true,
+			wantErr:     true,
+		},
+		{
+			name: "Failure - Duplicate List IDs",
+			lol: []list.List{
+				{
+					ID:   fixtures.ListId,
+					Name: "List 1",
+				},
+				{
+					ID:   fixtures.ListId,
+					Name: "List 2",
+				},
+			},
+			hasLikeList: false,
+			wantErr:     true,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			hasLikedQuestions, err := list.ValidateListOfLists(tc.lol)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("ValidateList() wantedErr = %v; got = %v", tc.wantErr, err)
+			}
+			if hasLikedQuestions != tc.hasLikeList {
+				t.Errorf("ValidateList() hasLIkedQuestions want = %v; got = %v", tc.hasLikeList, hasLikedQuestions)
+			}
+		})
+	}
+}
+
 func TestListString(t *testing.T) {
 	name := "test list"
 	input := list.List{

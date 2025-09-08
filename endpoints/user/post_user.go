@@ -3,19 +3,16 @@ package user
 import (
 	"ama/api/application/requests"
 	"ama/api/application/responses"
-	"ama/api/application/user"
 	"ama/api/interfaces"
 	"ama/api/logging"
 	"net/http"
 )
 
-// TODO: <<Move the read check, and the adding of the liked questions
-// list into this portion of the code, not the database implementation>>
 // Creates a new user in the database and returns that new user
 func PostUser(c interfaces.APIContext, db interfaces.UserCreator) {
 	logger := logging.GetLogger()
-	var newUser requests.PostUserRequest
-	err := c.BindJSON(&newUser)
+	var postReq requests.PostUserRequest
+	err := c.BindJSON(&postReq)
 	if err != nil {
 		msg := "malformed input data for user"
 		logger.Error(msg, "body", c.GetString("body"), "error", err)
@@ -23,13 +20,14 @@ func PostUser(c interfaces.APIContext, db interfaces.UserCreator) {
 		return
 	}
 
-	if err = user.ValidateUser(newUser.BaseUser); err != nil {
+	newUser, err := postReq.BaseUser()
+	if err != nil {
 		logger.Error("invalid input data for user", "body", newUser, "error", err)
 		c.IndentedJSON(http.StatusBadRequest, responses.NewError(err.Error()))
 		return
 	}
 
-	user, err := db.CreateUser(newUser.BaseUser)
+	user, err := db.CreateUser(newUser)
 	if err != nil {
 		msg := "error creating user"
 		logger.Error(msg, "error", err)

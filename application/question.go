@@ -11,8 +11,6 @@ import (
 // text of the question itself. It also has Tags which will help questions be
 // found and categorized.
 type Question struct {
-	// TODO: Look at this for marshalling and unmarshalling the id
-	// https://stackoverflow.com/questions/68870654/how-to-get-and-store-the-document-id-using-a-struct
 	// The database identifier for this question.
 	ID string `json:"id" firestore:"-" binding:"required" validate:"required"`
 	// The actual question itself.

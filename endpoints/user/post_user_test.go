@@ -2,6 +2,8 @@ package user_test
 
 import (
 	"ama/api/application"
+	"ama/api/application/list"
+	"ama/api/application/requests"
 	"ama/api/application/responses"
 	appUser "ama/api/application/user"
 	"ama/api/endpoints/user"
@@ -16,6 +18,15 @@ import (
 
 func TestPostUser(t *testing.T) {
 	validUserBytes, _ := json.Marshal(fixtures.ValidBaseUser)
+	validUserBytesNoLists, _ := json.Marshal(requests.PostUserRequest{
+		FirebaseID:   fixtures.ValidBaseUser.FirebaseID,
+		Email:        fixtures.ValidBaseUser.Email,
+		Name:         fixtures.ValidBaseUser.Name,
+		Tier:         fixtures.ValidBaseUser.Tier,
+		Settings:     fixtures.ValidBaseUser.Settings,
+		Subscription: fixtures.ValidBaseUser.Subscription,
+		Lists:        []list.List{},
+	})
 	invalidUserBytes, _ := json.Marshal(fixtures.InvalidBaseUser)
 	testCases := []struct {
 		name     string
@@ -25,7 +36,7 @@ func TestPostUser(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name:     "Success",
+			name:     "Success - Valid User",
 			wantCode: http.StatusCreated,
 			db: *test.NewMockUserManager(test.MockUserManagerConfig{
 				CreateUser: func(userData appUser.BaseUser) (application.User, error) {
@@ -34,6 +45,19 @@ func TestPostUser(t *testing.T) {
 			}),
 			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
 				InputJSON: validUserBytes,
+			}),
+			wantErr: false,
+		},
+		{
+			name:     "Success - Valid User No Lists",
+			wantCode: http.StatusCreated,
+			db: *test.NewMockUserManager(test.MockUserManagerConfig{
+				CreateUser: func(userData appUser.BaseUser) (application.User, error) {
+					return fixtures.ValidUser, nil
+				},
+			}),
+			ctx: *test.NewMockAPIContext(test.MockAPIContextConfig{
+				InputJSON: validUserBytesNoLists,
 			}),
 			wantErr: false,
 		},

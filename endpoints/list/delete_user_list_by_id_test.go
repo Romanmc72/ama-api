@@ -2,6 +2,7 @@ package list_test
 
 import (
 	"ama/api/application"
+	appList "ama/api/application/list"
 	"ama/api/application/responses"
 	"ama/api/constants"
 	"ama/api/endpoints/list"
@@ -90,7 +91,7 @@ func TestDeleteUserListByID(t *testing.T) {
 			ctx: test.NewMockAPIContext(test.MockAPIContextConfig{
 				Params: map[string]string{
 					constants.UserIdPathIdentifier: fixtures.UserId,
-					constants.ListIdPathIdentifier: fixtures.NewId,
+					constants.ListIdPathIdentifier: appList.LikedQuestionsListID,
 				},
 			}),
 			wantCode: http.StatusBadRequest,
