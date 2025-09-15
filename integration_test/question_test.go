@@ -5,9 +5,7 @@ package integration_test
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -17,10 +15,24 @@ import (
 	"ama/api/constants"
 )
 
-func TestQuestion(t *testing.T) {
+func GetQuestionBaseUrl(secure bool) string {
+	s := ""
+	if secure {
+		s = "s"
+	}
+	return fmt.Sprintf(
+		"http%s://%s:%d%s",
+		s,
+		ResourceServerHost,
+		ResourceServerPort,
+		constants.QuestionBasePath,
+	)
+}
+
+func QuestionSuite(t *testing.T) {
 	questionsToCreate := len(testQuestions)
 	client := &http.Client{}
-	authToken, err := signIn(client)
+	authToken, err := adminSignIn(client)
 	if err != nil {
 		t.Errorf("failed to sign in: %v", err)
 		return
@@ -37,7 +49,11 @@ func TestQuestion(t *testing.T) {
 	}
 }
 
-func signIn(httpClient *http.Client) (string, error) {
+func QuestionTearDownSuite(t *testing.T) {
+	// TODO: Delete all of the questions!
+}
+
+func adminSignIn(httpClient *http.Client) (string, error) {
 	authClient, err := auth.NewAuthClient()
 	if err != nil {
 		return "", err
@@ -47,15 +63,21 @@ func signIn(httpClient *http.Client) (string, error) {
 		"integration-test-client",
 		constants.GetAdminScopes(),
 	)
-	if err != nil {
-		return "", err
+	type adminToken struct {
+		Token             string `json:"token"`
+		ReturnSecureToken bool   `json:"returnSecureToken"`
+	}
+	aToken := adminToken{
+		Token:             token,
+		ReturnSecureToken: true,
 	}
 	secure := ""
 	if IsSecure {
 		secure = "s"
 	}
-	req, err := http.NewRequest(
-		http.MethodPost,
+	var validToken ReturnedToken
+	validToken, err = HitApi(
+		httpClient,
 		fmt.Sprintf(
 			"http%s://%s:%d/identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=%s",
 			secure,
@@ -63,27 +85,13 @@ func signIn(httpClient *http.Client) (string, error) {
 			EmulatorPort,
 			ApiKey,
 		),
-		strings.NewReader(fmt.Sprintf(`{"token": "%s", "returnSecureToken": true}`, token)))
+		http.MethodPost,
+		"",
+		aToken,
+		validToken,
+	)
 	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return "", fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	var validToken ReturnedToken
-	err = json.Unmarshal(respBody, &validToken)
-	if err != nil {
-		return "", fmt.Errorf("failed to unmarshal response: %s; err: %w", respBody, err)
+		return "", fmt.Errorf("failed to unmarshal response: %v; err: %w", validToken, err)
 	}
 	return validToken.IdToken, nil
 }
@@ -93,45 +101,17 @@ func createQuestion(i int, t string, client http.Client) (string, error) {
 		Prompt: testQuestions[i],
 		Tags:   []string{"test"},
 	}
-	body, err := json.Marshal(newQuestion)
-	if err != nil {
-		return "", err
-	}
-	secure := ""
-	if IsSecure {
-		secure = "s"
-	}
-	req, err := http.NewRequest(
-		http.MethodPost,
-		fmt.Sprintf(
-			"http%s://%s:%d%s",
-			secure,
-			ResourceServerHost,
-			ResourceServerPort,
-			constants.QuestionBasePath,
-		),
-		strings.NewReader(string(body)))
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Authorization", "Bearer "+t)
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 201 {
-		return "", fmt.Errorf("expected status code 201, got %d", resp.StatusCode)
-	}
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
 	var question application.Question
-	err = json.Unmarshal(respBody, &question)
+	question, err := HitApi(
+		&client,
+		GetQuestionBaseUrl(IsSecure),
+		http.MethodPost,
+		t,
+		newQuestion,
+		question,
+	)
 	if err != nil {
-		return "", fmt.Errorf("failed to unmarshal response: %s; err: %w", respBody, err)
+		return "", fmt.Errorf("failed to unmarshal response: %s; err: %w", &question, err)
 	}
 	return question.ID, nil
 }
@@ -314,4 +294,36 @@ var testQuestions = []string{
 	"Show me the most recent 3 pictures on your phone",
 	"When you instinctively open your phone for no reason, what apps do you check and in what order assuming there are no notifications?",
 	"How many bumper stickers is okay for a car to have?",
+}
+
+func ReadQuestions(client *http.Client, userToken string, tags []string, limit int, finalId string, random bool) ([]application.Question, error) {
+	var questions []application.Question
+	params := []string{}
+	if len(tags) > 0 {
+		for _, tag := range tags {
+			params = append(params, fmt.Sprintf("%s=%s", constants.TagParam, tag))
+		}
+	}
+	if limit != 0 {
+		params = append(params, fmt.Sprintf("%s=%d", constants.LimitParam, limit))
+	}
+	if finalId != "" {
+		params = append(params, fmt.Sprintf("%s=%s", constants.FinalIdParam, finalId))
+	}
+	if random {
+		params = append(params, fmt.Sprintf("%s=true", constants.RandomParam))
+	}
+	url := GetQuestionBaseUrl(IsSecure)
+	if len(params) > 0 {
+		queryParams := strings.Join(params, "&")
+		url = fmt.Sprintf("%s?%s", url, queryParams)
+	}
+	return HitApi(
+		client,
+		url,
+		http.MethodGet,
+		userToken,
+		nil,
+		questions,
+	)
 }

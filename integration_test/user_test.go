@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"testing"
@@ -16,13 +15,50 @@ import (
 	"ama/api/application"
 	"ama/api/application/list"
 	"ama/api/application/requests"
+	"ama/api/application/responses"
 	"ama/api/application/user"
 )
 
-func TestUser(t *testing.T) {
+const (
+	firebaseUrlPath   = "identitytoolkit.googleapis.com/v1/accounts"
+	firebaseSignUpUrl = firebaseUrlPath + ":signUp"
+	firebaseSignInUrl = firebaseUrlPath + ":signInWithPassword"
+)
+
+func getFirebaseSignUpUrl(secure bool) string {
+	s := ""
+	if secure {
+		s = "s"
+	}
+	return fmt.Sprintf(
+		"http%s://%s:%d/%s?key=%s",
+		s,
+		EmulatorHost,
+		EmulatorPort,
+		firebaseSignUpUrl,
+		ApiKey,
+	)
+}
+
+func getFirebaseSignInUrl(secure bool) string {
+	s := ""
+	if secure {
+		s = "s"
+	}
+	return fmt.Sprintf(
+		"http%s://%s:%d/%s?key=%s",
+		s,
+		EmulatorHost,
+		EmulatorPort,
+		firebaseSignInUrl,
+		ApiKey,
+	)
+}
+
+func UserSetupSuite(t *testing.T) {
 	t.Log("Running user integ tests")
 	client := &http.Client{}
-	token, err := getUserAuthToken(client, UserEmail, UserPass)
+	token, err := CreateUserAndGetToken(client, UserEmail, UserPass)
 	if err != nil {
 		t.Fatalf("Error getting user auth token: %v", err)
 	}
@@ -30,7 +66,32 @@ func TestUser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error creating user: %v", err)
 	}
+	u, err := readUser(client, token, userId)
+	if err != nil {
+		t.Fatalf("Error reading user: %s, err: %v", userId, err)
+	}
+	u.Name = "test user name change"
+	err = updateUser(client, token, userId, u.BaseUser)
+	if err != nil {
+		t.Fatalf("Error updating user: %s, data: %v, err: %v", userId, u, err)
+	}
 	t.Logf("Created user with ID: %s", userId)
+}
+
+func UserTearDownSuite(t *testing.T) {
+	client := &http.Client{}
+	token, err := SignUserInAndGetToken(client, UserEmail, UserPass)
+	if err != nil {
+		t.Fatalf("unable to get sign in token for %s err: %s", UserEmail, err)
+	}
+	userId, err := GetIdFromToken(token)
+	if err != nil {
+		t.Fatalf("unable to parse id from token: %s err: %s", token, err)
+	}
+	err = deleteUser(token, client, userId)
+	if err != nil {
+		t.Fatalf("failed to delete user %s, err: %s", userId, err)
+	}
 }
 
 type createUserRequest struct {
@@ -39,54 +100,62 @@ type createUserRequest struct {
 	ReturnSecureToken bool   `json:"returnSecureToken"`
 }
 
-func getUserAuthToken(httpClient *http.Client, email string, password string) (string, error) {
+func CreateUserAndGetToken(httpClient *http.Client, email string, password string) (string, error) {
+	return hitFirebaseEmulatorAuth(httpClient, email, password, getFirebaseSignUpUrl(IsSecure))
+}
+
+func SignUserInAndGetToken(httpClient *http.Client, email string, password string) (string, error) {
+	return hitFirebaseEmulatorAuth(httpClient, email, password, getFirebaseSignInUrl(IsSecure))
+}
+
+func GetUserBaseUrl(secure bool) string {
+	s := ""
+	if secure {
+		s = "s"
+	}
+	return fmt.Sprintf(
+			"http%s://%s:%d/user",
+			s,
+			ResourceServerHost,
+			ResourceServerPort,
+		)
+}
+
+func GetUserUrl(secure bool, userId string) string {
+	return fmt.Sprintf(
+			"%s/%s",
+			GetUserBaseUrl(secure),
+			userId,
+		)
+}
+
+func hitFirebaseEmulatorAuth(httpClient *http.Client, email string, password string, url string) (string, error) {
 	reqBody := createUserRequest{
 		Email:             email,
 		Password:          password,
 		ReturnSecureToken: true,
 	}
-	body, err := json.Marshal(reqBody)
-	if err != nil {
-		return "", err
-	}
-	secure := ""
-	if IsSecure {
-		secure = "s"
-	}
-	req, err := http.NewRequest(
-		http.MethodPost,
-		fmt.Sprintf(
-			"http%s://%s:%d/identitytoolkit.googleapis.com/v1/accounts:signUp?key=%s",
-			secure,
-			EmulatorHost,
-			EmulatorPort,
-			ApiKey,
-		),
-		strings.NewReader(string(body)))
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
 	var respToken map[string]any
-	err = json.Unmarshal(respBody, &respToken)
+	respToken, err := HitApi(
+		httpClient,
+		url,
+		http.MethodPost,
+		"",
+		reqBody,
+		respToken,
+	)
+	if err != nil {
+		return "", err
+	}
 	idToken, ok := respToken["idToken"].(string)
 	if !ok {
-		return "", fmt.Errorf("idToken not found in response: %s", respBody)
+		return "", fmt.Errorf("idToken not found in response: %v", respToken)
 	}
 	return idToken, nil
 }
 
 func createUser(idToken string, httpClient *http.Client, email string, name string) (string, error) {
-	firebaseId, err := getIdFromToken(idToken)
+	firebaseId, err := GetIdFromToken(idToken)
 	if err != nil {
 		return "", err
 	}
@@ -109,46 +178,67 @@ func createUser(idToken string, httpClient *http.Client, email string, name stri
 		},
 		Lists: []list.List{},
 	}
-	body, err := json.Marshal(userReqBody)
-	if err != nil {
-		return "", err
-	}
 	secure := ""
 	if IsSecure {
 		secure = "s"
 	}
-	req, err := http.NewRequest(
-		http.MethodPost,
+	var createdUser application.User
+	createdUser, err = HitApi(
+		httpClient,
 		fmt.Sprintf(
 			"http%s://%s:%d/user",
 			secure,
 			ResourceServerHost,
 			ResourceServerPort,
 		),
-		strings.NewReader(string(body)))
-	if err != nil {
-		return "", err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", idToken))
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	var createdUser application.User
-	err = json.Unmarshal(respBody, &createdUser)
+		http.MethodPost,
+		idToken,
+		userReqBody,
+		createdUser,
+	)
 	if err != nil {
 		return "", err
 	}
 	return createdUser.ID, nil
 }
 
-func getIdFromToken(idToken string) (string, error) {
+func readUser(client *http.Client, token string, userId string) (application.User, error) {
+	var u application.User
+	return HitApi(
+		client,
+		GetUserUrl(IsSecure, userId),
+		http.MethodGet,
+		token,
+		nil,
+		u,
+	)
+}
+
+func updateUser(client *http.Client, token string, userId string, u user.BaseUser) error {
+	_, err := HitApi(
+		client,
+		GetUserUrl(IsSecure, userId),
+		http.MethodPut,
+		token,
+		u,
+		responses.SuccessResponse{},
+	)
+	return err
+}
+
+func deleteUser(idToken string, client *http.Client, userId string) error {
+	_, err := HitApi(
+		client,
+		GetUserUrl(IsSecure, userId),
+		http.MethodDelete,
+		idToken,
+		nil,
+		responses.SuccessResponse{},
+	)
+	return err
+}
+
+func GetIdFromToken(idToken string) (string, error) {
 	splitToken := strings.Split(idToken, ".")
 	if len(splitToken) != 3 {
 		return "", fmt.Errorf("invalid token format")

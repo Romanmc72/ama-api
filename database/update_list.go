@@ -24,7 +24,7 @@ func (db *Database) UpdateList(userId string, updatedList list.List) error {
 			return err
 		}
 		var user application.User
-		err = userDoc.DataTo(user)
+		err = userDoc.DataTo(&user)
 		if err != nil {
 			db.logger.Error("Error converting user doc to user", "error", err, "user", userId)
 			return err

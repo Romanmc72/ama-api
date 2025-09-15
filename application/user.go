@@ -6,9 +6,6 @@ import (
 	"encoding/json"
 )
 
-// TODO remove the firestore bindings from these objects if we have database objects, otherwise remove the database objects themselves
-// TODO create a user with non-required bindings to enable updates more easily with partial user objects
-
 // Describes the shape of a user profile within the application.
 type User struct {
 	// The unique identifier for the user.

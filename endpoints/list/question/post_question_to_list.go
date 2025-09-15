@@ -48,5 +48,5 @@ func PostQuestionToList(c interfaces.APIContext, db interfaces.ListUpdater) {
 		c.IndentedJSON(http.StatusInternalServerError, responses.NewError("Error adding question to list"))
 		return
 	}
-	c.IndentedJSON(http.StatusOK, responses.NewSuccessResponse(true))
+	c.IndentedJSON(http.StatusCreated, responses.NewSuccessResponse(true))
 }

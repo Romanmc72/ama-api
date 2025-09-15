@@ -49,6 +49,9 @@ func (fcr *FirestoreCollectionRef) Doc(id string) interfaces.DocumentRef {
 
 func (fcr *FirestoreCollectionRef) Add(ctx context.Context, data any) (interfaces.DocumentRef, *firestore.WriteResult, error) {
 	docRef, wr, err := fcr.collectionRef.Add(ctx, data)
+	if err != nil {
+		return &FirestoreDocumentRef{}, wr, err
+	}
 	return &FirestoreDocumentRef{docRef: *docRef}, wr, err
 }
 
@@ -92,6 +95,9 @@ type FirestoreTransaction struct {
 
 func (ft *FirestoreTransaction) Get(doc *firestore.DocumentRef) (interfaces.DocumentSnapshot, error) {
 	ds, err := ft.tx.Get(doc)
+	if err != nil {
+		return &FirestoreDocumentSnapshot{}, err
+	}
 	return &FirestoreDocumentSnapshot{ds: *ds}, err
 }
 
@@ -143,6 +149,9 @@ func (fdr *FirestoreDocumentRef) ID() string {
 
 func (fdr *FirestoreDocumentRef) Get(ctx context.Context) (interfaces.DocumentSnapshot, error) {
 	ds, err := fdr.docRef.Get(ctx)
+	if err != nil {
+		return &FirestoreDocumentSnapshot{}, err
+	}
 	return &FirestoreDocumentSnapshot{ds: *ds}, err
 }
 
@@ -189,6 +198,9 @@ type FirestoreDocumentIterator struct {
 
 func (fdi *FirestoreDocumentIterator) Next() (interfaces.DocumentSnapshot, error) {
 	ds, err := fdi.iterator.Next()
+	if err != nil {
+		return &FirestoreDocumentSnapshot{}, err
+	}
 	return &FirestoreDocumentSnapshot{ds: *ds}, err
 }
 
