@@ -172,7 +172,21 @@ deploy() {
 integ() {
 	echo 'Starting integration tests...'
 	_set_env_vars
-	go test -count=1 -tags="integration" ./...
+	go test -count=1 -tags="integration" ./integration_test
+}
+
+integsetup() {
+	echo 'Starting integration tests...'
+	_set_env_vars
+	export USER_EMAIL="$(uuidgen | cut -d'-' -f2)@t.com"
+	go test -count=1 -tags="integration" ./integration_test -suite=setup
+	echo "User Email: '${USER_EMAIL}'"
+}
+
+integteardown() {
+	echo 'Starting integration tests...'
+	_set_env_vars
+	go test -count=1 -tags="integration" ./integration_test -suite=teardown
 }
 
 ci() {

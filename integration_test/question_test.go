@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"ama/api/application"
+	"ama/api/application/responses"
 	"ama/api/auth"
 	"ama/api/constants"
 )
@@ -29,7 +30,15 @@ func GetQuestionBaseUrl(secure bool) string {
 	)
 }
 
-func QuestionSuite(t *testing.T) {
+func GetQuestionUrl(secure bool, questionId string) string {
+	return fmt.Sprintf(
+		"%s/%s",
+		GetQuestionBaseUrl(secure),
+		questionId,
+	)
+}
+
+func QuestionSetUpSuite(t *testing.T) {
 	questionsToCreate := len(testQuestions)
 	client := &http.Client{}
 	authToken, err := adminSignIn(client)
@@ -50,7 +59,42 @@ func QuestionSuite(t *testing.T) {
 }
 
 func QuestionTearDownSuite(t *testing.T) {
-	// TODO: Delete all of the questions!
+	client := &http.Client{}
+	limit := 10
+	finalId := ""
+	userToken, err := SignUserInAndGetToken(client, UserEmail, UserPass)
+	if err != nil {
+		t.Fatalf("failed to sign user %s in err: %e", UserEmail, err)
+	}
+	adminToken, err := adminSignIn(client)
+	if err != nil {
+		t.Fatalf("failed to sign into admin token err: %e", err)
+	}
+	qs, err := ReadQuestions(client, userToken, TestTags, limit, finalId, false)
+	if err != nil || len(qs) == 0 {
+		t.Fatalf("failed to get questions err: %e", err)
+	}
+	modifyTest := qs[0]
+	modifyTest.Prompt = "test new prompt!"
+	err = updateQuestion(client, adminToken, modifyTest)
+	if err != nil {
+		t.Fatalf("failed to update question %s err: %s", modifyTest, err)
+	}
+	tot := 0
+	for len(qs) > 0 {
+		for i, q := range qs {
+			finalId := q.ID
+			err := deleteQuestion(client, adminToken, finalId)
+			if err != nil {
+				t.Fatalf("failed to delete question: %s, deleted %d so far, err: %s", finalId, tot + i, err)
+			}
+		}
+		tot += len(qs)
+		qs, err = ReadQuestions(client, userToken, TestTags, limit, finalId, false)
+		if err != nil {
+			t.Fatalf("failed to get next batch of questions, deleted %d, err: %s", tot, err)
+		}
+	}
 }
 
 func adminSignIn(httpClient *http.Client) (string, error) {
@@ -99,7 +143,7 @@ func adminSignIn(httpClient *http.Client) (string, error) {
 func createQuestion(i int, t string, client http.Client) (string, error) {
 	newQuestion := application.NewQuestion{
 		Prompt: testQuestions[i],
-		Tags:   []string{"test"},
+		Tags:   TestTags,
 	}
 	var question application.Question
 	question, err := HitApi(
@@ -114,6 +158,34 @@ func createQuestion(i int, t string, client http.Client) (string, error) {
 		return "", fmt.Errorf("failed to unmarshal response: %s; err: %w", &question, err)
 	}
 	return question.ID, nil
+}
+
+func deleteQuestion(client *http.Client, t string, questionId string) error {
+	_, err := HitApi(
+		client,
+		GetQuestionUrl(IsSecure, questionId),
+		http.MethodDelete,
+		t,
+		nil,
+		responses.SuccessResponse{},
+	)
+	return err
+}
+
+func updateQuestion(client *http.Client, t string, q application.Question) error {
+	nq := application.NewQuestion{
+		Prompt: q.Prompt,
+		Tags: q.Tags,
+	}
+	_, err := HitApi(
+		client,
+		GetQuestionUrl(IsSecure, q.ID),
+		http.MethodPut,
+		t,
+		nq,
+		responses.SuccessResponse{},
+	)
+	return err
 }
 
 var testQuestions = []string{

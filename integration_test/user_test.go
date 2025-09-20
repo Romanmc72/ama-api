@@ -55,7 +55,7 @@ func getFirebaseSignInUrl(secure bool) string {
 	)
 }
 
-func UserSetupSuite(t *testing.T) {
+func UserSetUpSuite(t *testing.T) {
 	t.Log("Running user integ tests")
 	client := &http.Client{}
 	token, err := CreateUserAndGetToken(client, UserEmail, UserPass)
@@ -114,19 +114,19 @@ func GetUserBaseUrl(secure bool) string {
 		s = "s"
 	}
 	return fmt.Sprintf(
-			"http%s://%s:%d/user",
-			s,
-			ResourceServerHost,
-			ResourceServerPort,
-		)
+		"http%s://%s:%d/user",
+		s,
+		ResourceServerHost,
+		ResourceServerPort,
+	)
 }
 
 func GetUserUrl(secure bool, userId string) string {
 	return fmt.Sprintf(
-			"%s/%s",
-			GetUserBaseUrl(secure),
-			userId,
-		)
+		"%s/%s",
+		GetUserBaseUrl(secure),
+		userId,
+	)
 }
 
 func hitFirebaseEmulatorAuth(httpClient *http.Client, email string, password string, url string) (string, error) {

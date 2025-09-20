@@ -66,7 +66,7 @@ func ListSuite(t *testing.T) {
 		t.Fatalf("Error updating list %s, err: %s", newList.ID, err)
 	}
 	limit := 10
-	qs, err := ReadQuestions(client, token, []string{"test"}, limit, "", false)
+	qs, err := ReadQuestions(client, token, TestTags, limit, "", false)
 	if err != nil {
 		t.Fatalf("failed to read questions %s", err)
 	}

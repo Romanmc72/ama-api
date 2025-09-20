@@ -1,3 +1,6 @@
+//go:build integration
+// +build integration
+
 package integration_test
 
 import (
@@ -5,12 +8,22 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
-// TODO: Get these to be dynamic per-test-run
+var TestTags = []string{"test"}
+var UserEmail = os.Getenv("USER_EMAIL")
+
+func init() {
+	if UserEmail == "" {
+		UserEmail = fmt.Sprintf("%s@t.com", uuid.NewString())
+	}
+}
+
 const (
-	UserEmail          = "t@t.com"
 	UserPass           = "password123"
 	EmulatorHost       = "localhost"
 	EmulatorPort       = 9099

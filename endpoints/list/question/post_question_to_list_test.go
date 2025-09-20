@@ -19,7 +19,7 @@ func TestPostQuestionToList(t *testing.T) {
 		ctx      *test.MockAPIContext
 		wantCode int
 		wantErr  bool
-	}{	
+	}{
 		{
 			name: "Success",
 			db: test.NewMockListManager(test.MockListManagerConfig{
