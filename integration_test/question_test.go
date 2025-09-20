@@ -86,7 +86,7 @@ func QuestionTearDownSuite(t *testing.T) {
 			finalId := q.ID
 			err := deleteQuestion(client, adminToken, finalId)
 			if err != nil {
-				t.Fatalf("failed to delete question: %s, deleted %d so far, err: %s", finalId, tot + i, err)
+				t.Fatalf("failed to delete question: %s, deleted %d so far, err: %s", finalId, tot+i, err)
 			}
 		}
 		tot += len(qs)
@@ -175,7 +175,7 @@ func deleteQuestion(client *http.Client, t string, questionId string) error {
 func updateQuestion(client *http.Client, t string, q application.Question) error {
 	nq := application.NewQuestion{
 		Prompt: q.Prompt,
-		Tags: q.Tags,
+		Tags:   q.Tags,
 	}
 	_, err := HitApi(
 		client,

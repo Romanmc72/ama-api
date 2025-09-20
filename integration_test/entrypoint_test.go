@@ -7,20 +7,22 @@ import (
 	"flag"
 	"testing"
 )
+
 const (
-	flagHelp = "Which test suite to run, can be 'all' | 'setup' | 'teardown' or for short 'a' | 's' | 't'. Defaults to 'all', fails on bad flag being passed in."
-	SuitesRunAll = "all"
-	SuitesRunSetUp = "setup"
+	flagHelp          = "Which test suite to run, can be 'all' | 'setup' | 'teardown' or for short 'a' | 's' | 't'. Defaults to 'all', fails on bad flag being passed in."
+	SuitesRunAll      = "all"
+	SuitesRunSetUp    = "setup"
 	SuitesRunTearDown = "teardown"
 )
+
 var suite = flag.String("suite", "", flagHelp)
 var suiteMap = map[string]string{
-	SuitesRunAll: SuitesRunAll,
-	"a": SuitesRunAll,
-	SuitesRunSetUp: SuitesRunSetUp,
-	"s": SuitesRunSetUp,
+	SuitesRunAll:      SuitesRunAll,
+	"a":               SuitesRunAll,
+	SuitesRunSetUp:    SuitesRunSetUp,
+	"s":               SuitesRunSetUp,
 	SuitesRunTearDown: SuitesRunTearDown,
-	"t": SuitesRunTearDown,
+	"t":               SuitesRunTearDown,
 }
 
 func TestMain(m *testing.M) {
@@ -33,14 +35,14 @@ func TestMain(m *testing.M) {
 }
 
 func runSetUp(t *testing.T) {
-		t.Run("Question Creation Test Suite", QuestionSetUpSuite)
-		t.Run("User Setup Test Suite", UserSetUpSuite)
-		t.Run("List Test Suite", ListSuite)
+	t.Run("Question Creation Test Suite", QuestionSetUpSuite)
+	t.Run("User Setup Test Suite", UserSetUpSuite)
+	t.Run("List Test Suite", ListSuite)
 }
 
 func runTearDown(t *testing.T) {
-		t.Run("User Teardown Test Suite", UserTearDownSuite)
-		t.Run("Question Teardown Test Suite", QuestionTearDownSuite)
+	t.Run("User Teardown Test Suite", UserTearDownSuite)
+	t.Run("Question Teardown Test Suite", QuestionTearDownSuite)
 }
 
 func TestSetUpSuite(t *testing.T) {
