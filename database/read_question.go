@@ -5,12 +5,12 @@ import (
 	"google.golang.org/grpc/status"
 
 	"ama/api/application"
-	"ama/api/firestoreobjects"
+	"ama/api/constants"
 )
 
 // Retrieve a particular question from the database
-func (db *Database) ReadQuestion(id string) (application.Question, error) {
-	collection := db.client.Collection(firestoreobjects.QuestionCollection)
+func (db *Database) ReadQuestion(id string) (q application.Question, err error) {
+	collection := db.client.Collection(constants.QuestionCollection)
 	var questionFetched application.NewQuestion
 	document, err := collection.Doc(id).Get(db.ctx)
 	if err != nil {
@@ -22,11 +22,14 @@ func (db *Database) ReadQuestion(id string) (application.Question, error) {
 				"error",
 				err,
 			)
-			return application.Question{}, err
+			return q, err
 		}
 		db.logger.Error("Encountered an error fetching the question", "id", id, "error", err)
-		return application.Question{}, err
+		return q, err
 	}
-	document.DataTo(&questionFetched)
+	err = document.DataTo(&questionFetched)
+	if err != nil {
+		return q, err
+	}
 	return questionFetched.Question(id), nil
 }

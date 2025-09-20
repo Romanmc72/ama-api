@@ -9,9 +9,9 @@ import (
 // application will create one.
 type NewQuestion struct {
 	// The actual question itself.
-	Prompt string `json:"prompt" binding:"required"`
+	Prompt string `json:"prompt" binding:"required" validate:"required"`
 	// The tags identifying what kind of question this is.
-	Tags []string `json:"tags" binding:"required"`
+	Tags []string `json:"tags" binding:"required" validate:"required"`
 }
 
 // `Question.String` converts the question to a string format.
@@ -26,8 +26,8 @@ func (q *NewQuestion) String() string {
 // be written to the database.
 func (q *NewQuestion) Question(questionId string) Question {
 	return Question{
-		ID: questionId,
+		ID:     questionId,
 		Prompt: q.Prompt,
-		Tags: q.Tags,
+		Tags:   q.Tags,
 	}
 }

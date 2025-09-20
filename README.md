@@ -31,8 +31,10 @@ Exit with Ctrl+c
 
 The code will be built and deployed using Docker. The target compute platform will be a GCP Cloud Run service. The docker image will be pushed up to the GCP Artifact Registry in the target GCP project.
 
-Take a look at the Dockerfile for details.
+Take a look at the Dockerfile for details and the associated CDK infrastructure repo.
 
 ## Testing
 
-Run unit tests using the `./build.sh test` script and run integration tests after standing up the API and database using `./test.sh`.
+Run unit tests using the `./build.sh test` script and run integration tests after standing up the API and database using `./build.sh integ`.
+
+There are some integration tests to simply set up the test environment for app development locally, those can be run with `./build.sh integsetup` and the tear down can be run with `./build.sh integteardown`.

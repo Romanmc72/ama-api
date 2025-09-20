@@ -3,6 +3,7 @@ package interfaces
 
 import (
 	"ama/api/application"
+	"ama/api/application/user"
 	"time"
 )
 
@@ -15,19 +16,19 @@ type UserConverter interface {
 // Anything that can create a new user
 type UserCreator interface {
 	// Create a new user and return the newly created user
-	CreateUser(userData UserConverter) application.User
+	CreateUser(userData user.BaseUser) (application.User, error)
 }
 
 // Anything that can retrieve a user
 type UserReader interface {
 	// Get a particular user from the database given their user id
-	ReadUser(id string) application.User
+	ReadUser(id string) (application.User, error)
 }
 
 // Anything that can update a user
 type UserWriter interface {
 	// Update a user using new user data
-	UpdateUser(userData UserConverter) application.User
+	UpdateUser(userData UserConverter) error
 }
 
 // Anything capable of deleting a user

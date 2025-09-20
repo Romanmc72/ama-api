@@ -1,12 +1,14 @@
 package endpoints
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"strconv"
 	"strings"
 
+	"ama/api/constants"
 	"ama/api/interfaces"
 	"ama/api/logging"
-	"ama/api/paths"
 )
 
 // This only kinda works, see this for examples:
@@ -47,13 +49,49 @@ func GetQueryParamToInt64(c interfaces.APIContext, paramName string, defaultValu
 	return value
 }
 
-// If a query parameter is supposed to be an array of values delimited by
-// some separator, then this will split them out to that array.
-func GetQueryParamToStringArray(c interfaces.APIContext, paramName string, defaultValue string) []string {
-	rawValue := c.DefaultQuery(paramName, defaultValue)
-	values := strings.Split(rawValue, paths.ArraySeparator)
-	if strings.TrimSpace(values[0]) == "" {
-		return []string{}
+// Generates a random string based on the base64 encoded output of a random
+// byte slice defined by length. length does not determine the final string
+// length. The final string will be at the *longest* the same size as length.
+func generateRandomString(length int) string {
+	if length <= 0 {
+		length = 1
 	}
-	return values
+	randomBytes := make([]byte, length)
+	l, err := rand.Read(randomBytes)
+	if err != nil || l != length {
+		logger := logging.GetLogger()
+		logger.Error("Error generating random string", "length", length, "error", err)
+		return ""
+	}
+	// Firestore document names cannot contain forward slashes, so we replace them with
+	// an empty string to prevent errors.
+	randomizedValue := strings.ReplaceAll(base64.RawStdEncoding.EncodeToString(randomBytes), "/", "")
+	if len(randomizedValue) < length {
+		return randomizedValue
+	}
+	return randomizedValue[:length]
+}
+
+// Parses the API parameters for reading questions with defaults.
+func GetReadQuestionsParamsWithDefaults(c interfaces.APIContext) (limit int, finalId string, tags []string) {
+	logger := logging.GetLogger()
+	limit = GetQueryParamToInt(c, constants.LimitParam, constants.DefaultLimit)
+	random := c.DefaultQuery(constants.RandomParam, "false")
+	if random == "true" {
+		finalId = c.DefaultQuery(constants.FinalIdParam, generateRandomString(8))
+	} else {
+		finalId = c.DefaultQuery(constants.FinalIdParam, "")
+	}
+	tags, hasTags := c.GetQueryArray(constants.TagParam)
+	if !hasTags {
+		tags = []string{}
+	}
+	logger.Debug(
+		"Read question params",
+		constants.LimitParam, limit,
+		constants.FinalIdParam, finalId,
+		constants.TagParam, tags,
+		constants.RandomParam, random,
+	)
+	return limit, finalId, tags
 }

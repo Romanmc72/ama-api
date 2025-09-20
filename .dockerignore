@@ -11,6 +11,7 @@ firebase-debug.*.log*
 .firebase/
 *firebase*
 *firestore*
+!firestoreobjects
 
 # Firebase config
 
@@ -68,6 +69,7 @@ node_modules/
 # dotenv environment variables file
 .env
 
-./build.sh
+# The build and test scripts
+./*.sh
 *.md
 .gitignore
