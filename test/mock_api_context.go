@@ -2,6 +2,7 @@ package test
 
 import (
 	"encoding/json"
+	"net/http"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -23,6 +24,7 @@ type MockAPIContext struct {
 	validate *validator.Validate
 	headers  map[string]string
 	values   map[string]any
+	req      http.Request
 }
 
 type MockAPIContextConfig struct {
@@ -31,6 +33,7 @@ type MockAPIContextConfig struct {
 	QueryValues map[string][]string
 	Headers     map[string]string
 	Values      map[string]any
+	Request     http.Request
 }
 
 // NewMockAPIContext creates a new instance of MockAPIContext
@@ -66,6 +69,7 @@ func NewMockAPIContext(cfg MockAPIContextConfig) *MockAPIContext {
 		validate:    validator.New(),
 		headers:     headers,
 		values:      values,
+		req:         cfg.Request,
 	}
 }
 
@@ -157,6 +161,10 @@ func (m *MockAPIContext) AbortWithStatusJSON(code int, jsonObj any) {
 
 func (m *MockAPIContext) Next() {}
 
+func (m *MockAPIContext) Request() http.Request {
+	return m.req
+}
+
 func (m *MockAPIContext) Deadline() (deadline time.Time, ok bool) {
 	return time.Time{}, false
 }
@@ -171,4 +179,9 @@ func (m *MockAPIContext) Err() error {
 
 func (m *MockAPIContext) Value(key any) any {
 	return m.values[key.(string)]
+}
+
+// Just for retrieving and checking the set headers from the test context
+func (m *MockAPIContext) GetTestHeaders() map[string]string {
+	return m.headers
 }

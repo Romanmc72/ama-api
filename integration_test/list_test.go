@@ -86,13 +86,6 @@ func ListSuite(t *testing.T) {
 	if len(qs) != len(r.Questions) {
 		t.Fatalf("wanted to see %d questions in the list, got %d instead", len(qs), len(r.Questions))
 	}
-	// for i, q := range r.Questions {
-	// 	err := listClient.RemoveFromList(userId, listId, q.ID)
-	// 	if err != nil {
-	// 		t.Fatalf("iteration %d of %d; failed to remove question %s from list %s, err: %s", i, len(qs), q.ID, listId, err)
-	// 	}
-	// }
-	// listClient.DeleteList(userId, listId)
 }
 
 type ListTestClient struct {

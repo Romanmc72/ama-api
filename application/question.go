@@ -12,7 +12,7 @@ import (
 // found and categorized.
 type Question struct {
 	// The database identifier for this question.
-	ID string `json:"id" firestore:"-" binding:"required" validate:"required"`
+	ID string `json:"questionId" firestore:"-" binding:"required" validate:"required"`
 	// The actual question itself.
 	Prompt string `json:"prompt" firestore:"prompt" binding:"required" validate:"required"`
 	// The tags identifying what kind of question this is.

@@ -13,7 +13,7 @@ const LikedQuestionsListID = "84e37c9a-3ff3-4643-82fd-49977fb35fe8"
 // A list of questions
 type List struct {
 	// The unique identifier for the list.
-	ID string `json:"id" firestore:"id" binding:"required"`
+	ID string `json:"listId" firestore:"id" binding:"required"`
 	// The human readable name for the list
 	Name string `json:"name" firestore:"name" binding:"required"`
 }
