@@ -30,9 +30,11 @@ func (db *Database) UpdateList(userId string, updatedList list.List) error {
 			return err
 		}
 		var existingList *list.List
-		for _, l := range user.Lists {
+		var listIndex int
+		for i, l := range user.Lists {
 			if l.ID == updatedList.ID {
-				existingList = &updatedList
+				existingList = &l
+				listIndex = i
 				break
 			}
 		}
@@ -47,6 +49,7 @@ func (db *Database) UpdateList(userId string, updatedList list.List) error {
 			db.logger.Error("This updated list is invalid", "error", err, "user", userId, "list", updatedList)
 			return err
 		}
+		user.Lists[listIndex] = updatedList
 		return tx.Set(userDocRef.Ref(), user)
 	})
 }

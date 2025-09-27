@@ -80,6 +80,9 @@ func ListSuite(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to read list %s, err: %s", listId, err)
 	}
+	if r.List.Name != newListName {
+		t.Fatalf("List name failed to update want: %s, got: %s", newListName, r.List.Name)
+	}
 	if r.List.ID != listId {
 		t.Fatalf("wanted list: %s, got list: %s", listId, r.List.ID)
 	}

@@ -73,13 +73,15 @@ func generateRandomString(length int) string {
 }
 
 // Parses the API parameters for reading questions with defaults.
-func GetReadQuestionsParamsWithDefaults(c interfaces.APIContext) (limit int, finalId string, tags []string) {
+func GetReadQuestionsParamsWithDefaults(c interfaces.APIContext) (limit int, finalId string, tags []string, random bool) {
 	logger := logging.GetLogger()
 	limit = GetQueryParamToInt(c, constants.LimitParam, constants.DefaultLimit)
-	random := c.DefaultQuery(constants.RandomParam, "false")
-	if random == "true" {
+	r := c.DefaultQuery(constants.RandomParam, "false")
+	if r == "true" {
+		random = true
 		finalId = c.DefaultQuery(constants.FinalIdParam, generateRandomString(8))
 	} else {
+		random = false
 		finalId = c.DefaultQuery(constants.FinalIdParam, "")
 	}
 	tags, hasTags := c.GetQueryArray(constants.TagParam)
@@ -93,5 +95,5 @@ func GetReadQuestionsParamsWithDefaults(c interfaces.APIContext) (limit int, fin
 		constants.TagParam, tags,
 		constants.RandomParam, random,
 	)
-	return limit, finalId, tags
+	return limit, finalId, tags, random
 }

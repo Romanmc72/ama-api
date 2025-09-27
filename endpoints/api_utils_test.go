@@ -108,14 +108,15 @@ func TestGetReadQuestionsParamsWithDefaults(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			gotLimit, gotFinalId, gotTags := endpoints.GetReadQuestionsParamsWithDefaults(tc.ctx)
+			gotLimit, gotFinalId, gotTags, gotRandom := endpoints.GetReadQuestionsParamsWithDefaults(tc.ctx)
 
-			if tc.wantLimit != gotLimit || (!tc.isRandom && tc.wantFinalId != gotFinalId) || !slices.Equal(tc.wantTags, gotTags) {
+			if tc.wantLimit != gotLimit || (!tc.isRandom && tc.wantFinalId != gotFinalId) || !slices.Equal(tc.wantTags, gotTags) || tc.isRandom != gotRandom {
 				t.Errorf(
 					"GetReadQuestionsParamsWithDefaults() "+
 						"wantLimit = %d; gotLimit = %d; "+
 						"wantFinalId = %s (randomFinalId = %v); gotFinalId = %s; "+
-						"wantTags = %v; gotTags = %v",
+						"wantTags = %v; gotTags = %v"+
+						"wantRandom = %v; gotRandom = %v",
 					tc.wantLimit,
 					gotLimit,
 					tc.wantFinalId,
@@ -123,6 +124,8 @@ func TestGetReadQuestionsParamsWithDefaults(t *testing.T) {
 					gotFinalId,
 					tc.wantTags,
 					gotTags,
+					tc.isRandom,
+					gotRandom,
 				)
 			}
 		})
