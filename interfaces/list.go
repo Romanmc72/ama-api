@@ -8,6 +8,7 @@ import (
 type ListReader interface {
 	UserReader
 	ReadList(userId string, listId string, limit int, finalId string, tags []string) (list.List, []application.Question, error)
+	ReadListQuestion(userId string, listId string, questionId string) (application.Question, error)
 }
 
 type ListCreator interface {

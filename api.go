@@ -125,6 +125,10 @@ func main() {
 	)
 
 	// User list question endpoints
+	validatedUserGroup.GET(
+		constants.UserListQuestionByIdPath,
+		func(c *gin.Context) { listQuestion.GetQuestionFromList(endpoints.NewAPIContext(c), &db) },
+	)
 	validatedUserGroup.POST(
 		constants.UserListQuestionByIdPath,
 		func(c *gin.Context) { listQuestion.PostQuestionToList(endpoints.NewAPIContext(c), &db) },

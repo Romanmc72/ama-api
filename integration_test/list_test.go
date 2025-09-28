@@ -4,6 +4,7 @@
 package integration_test
 
 import (
+	"ama/api/application"
 	"ama/api/application/list"
 	"ama/api/application/requests"
 	"ama/api/application/responses"
@@ -86,8 +87,16 @@ func ListSuite(t *testing.T) {
 	if r.List.ID != listId {
 		t.Fatalf("wanted list: %s, got list: %s", listId, r.List.ID)
 	}
-	if len(qs) != len(r.Questions) {
+	if len(qs) != len(r.Questions) || len(qs) == 0 {
 		t.Fatalf("wanted to see %d questions in the list, got %d instead", len(qs), len(r.Questions))
+	}
+	testQ := qs[0]
+	fetchedQ, err := listClient.GetFromList(userId, listId, testQ.ID)
+	if err != nil {
+		t.Fatalf("failed to get question %s from list %s, err: %s", testQ.ID, listId, err)
+	}
+	if fetchedQ.ID != testQ.ID {
+		t.Fatalf("wanted question %s, got %s instead", testQ.ID, fetchedQ.ID)
 	}
 }
 
@@ -150,6 +159,17 @@ func (ltc *ListTestClient) DeleteList(userId string, listId string) error {
 		responses.SuccessResponse{},
 	)
 	return err
+}
+
+func (ltc *ListTestClient) GetFromList(userId string, listId string, questionId string) (application.Question, error) {
+	return HitApi(
+		ltc.client,
+		GetListQuestionUrlPath(IsSecure, userId, listId, questionId),
+		http.MethodGet,
+		ltc.idToken,
+		nil,
+		application.Question{},
+	)
 }
 
 func (ltc *ListTestClient) AddToList(userId string, listId string, questionId string) error {

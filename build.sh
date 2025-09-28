@@ -172,7 +172,9 @@ deploy() {
 integ() {
 	echo 'Starting integration tests...'
 	_set_env_vars
-	go test -count=1 -tags="integration" ./integration_test
+	export USER_EMAIL="$(uuidgen | cut -d'-' -f2)@t.com"
+	go test -count=1 -tags="integration" ./integration_test -suite=all
+	echo "User Email: '${USER_EMAIL}'"
 }
 
 integsetup() {
@@ -186,6 +188,8 @@ integsetup() {
 integteardown() {
 	echo 'Starting integration tests...'
 	_set_env_vars
+	echo "DON'T FORGET TO SET THE EMAIL FOR TEARDOWN"
+	echo "User Email: '${USER_EMAIL}'"
 	go test -count=1 -tags="integration" ./integration_test -suite=teardown
 }
 
