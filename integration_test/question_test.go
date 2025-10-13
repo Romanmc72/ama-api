@@ -143,7 +143,7 @@ func adminSignIn(httpClient *http.Client) (string, error) {
 var otherRandomTags = []string{"religion", "nsfw", "philosophy", "life", "deep", "fun", "random", "personal", "introspective"}
 
 func createQuestion(i int, t string, client http.Client) (string, error) {
-	randomTag := otherRandomTags[i % len(otherRandomTags)]
+	randomTag := otherRandomTags[i%len(otherRandomTags)]
 	newQuestion := application.NewQuestion{
 		Prompt: testQuestions[i],
 		Tags:   append(TestTags, randomTag),
