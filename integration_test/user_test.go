@@ -75,7 +75,11 @@ func UserSetUpSuite(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error updating user: %s, data: %v, err: %v", userId, u, err)
 	}
-	t.Logf("Created user with ID: %s", userId)
+	u.Tier = user.PremiumTier
+	err = updateUser(client, token, userId, u.BaseUser)
+	if err == nil {
+		t.Fatalf("There should have been an error, users cannot update their tier, that is handled by the payment system user: %s, data: %v", userId, u)
+	}
 }
 
 func UserTearDownSuite(t *testing.T) {

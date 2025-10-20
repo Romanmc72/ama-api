@@ -5,14 +5,20 @@ import (
 )
 
 const (
-	FreeTier    = "free"
-	LiteTier    = "lite"
-	PremiumTier = "premium"
+	// You like the app but don't want all of the features and you don't mind ads
+	FreeTier      = "free"
+	// You like the app and want all of the features, but don't mind ads
+	LiteTier      = "lite"
+	// You like the app and want all of the features without ads
+	PremiumTier   = "premium"
+	// Looks like you missed a payment lmao, now you're temporarily in free tier
+	// til you pay up or downgrade
+	SuspendedTier = "suspended"
 )
 
 // Get the list of valid user tiers.
 func Tiers() []string {
-	return []string{FreeTier, LiteTier, PremiumTier}
+	return []string{FreeTier, LiteTier, PremiumTier, SuspendedTier}
 }
 
 // The base user object, without an ID. Can be used for various implementations
