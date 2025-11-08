@@ -8,10 +8,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"ama/api/auth"
 	"ama/api/constants"
 	"ama/api/database"
+	_ "ama/api/docs"
 	"ama/api/endpoints"
 	"ama/api/endpoints/list"
 	listQuestion "ama/api/endpoints/list/question"
@@ -20,7 +23,23 @@ import (
 	"ama/api/logging"
 )
 
+// Ping godoc
+//
+//	@Summary		Check API health
+//	@Description	see if the server is up and running with this health check endpoint
+//	@Tags			healthcheck
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	map[string]string
+//	@Example		{ "ping": "pong" }
+//	@Router			/ping [get]
+func PingHandler(c *gin.Context) { c.IndentedJSON(http.StatusOK, map[string]string{"ping": "pong"}) }
+
+//	@BasePath	/
+
 // main() is the main entrypoint for the program that starts and serves the API.
+//
+//	@title	Ask Me Anything API
 func main() {
 	port := flag.Int("port", 8088, "The port to launch the server on. Default=8088.")
 	flag.Parse()
@@ -39,11 +58,7 @@ func main() {
 
 	router.Use(func(c *gin.Context) { auth.CORSHeaders(endpoints.NewAPIContext(c)) })
 
-	// Health check endpoint
-	router.GET(
-		constants.PingPath,
-		func(c *gin.Context) { c.IndentedJSON(http.StatusOK, map[string]string{"ping": "pong"}) },
-	)
+	router.GET(constants.PingPath, PingHandler)
 
 	// Routes requiring the authorization header to be set
 	authorizedGroup := router.Group("/")
@@ -52,6 +67,15 @@ func main() {
 	// Question endpoints
 	authorizedGroup.GET(
 		constants.QuestionBasePath,
+		// PingExample godoc
+		//	@Summary	ping health check
+		//	@Schemes
+		//	@Description	do ping to see if the server is up
+		//	@Tags			healthcheck
+		//	@Accept			json
+		//	@Produce		json
+		//	@Success		200	{map[string]string{"ping": "pong"}}
+		//	@Router			/ping [get]
 		func(c *gin.Context) { question.GetQuestions(endpoints.NewAPIContext(c), &db) },
 	)
 	authorizedGroup.GET(
@@ -140,6 +164,7 @@ func main() {
 
 	// User question list endpoints
 	logger.Info("Starting the server")
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	router.Run(fmt.Sprintf("0.0.0.0:%d", *port))
 	logger.Info("Shutting down the server")
 }

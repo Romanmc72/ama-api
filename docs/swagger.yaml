@@ -1,0 +1,23 @@
+basePath: /
+info:
+  contact: {}
+  title: Ask Me Anything API
+paths:
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: see if the server is up and running with this health check endpoint
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Check API health
+      tags:
+      - healthcheck
+swagger: "2.0"

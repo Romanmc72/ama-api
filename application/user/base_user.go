@@ -6,11 +6,11 @@ import (
 
 const (
 	// You like the app but don't want all of the features and you don't mind ads
-	FreeTier      = "free"
+	FreeTier = "free"
 	// You like the app and want all of the features, but don't mind ads
-	LiteTier      = "lite"
+	LiteTier = "lite"
 	// You like the app and want all of the features without ads
-	PremiumTier   = "premium"
+	PremiumTier = "premium"
 	// Looks like you missed a payment lmao, now you're temporarily in free tier
 	// til you pay up or downgrade
 	SuspendedTier = "suspended"

@@ -1,0 +1,36 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Ask Me Anything API",
+        "contact": {}
+    },
+    "basePath": "/",
+    "paths": {
+        "/ping": {
+            "get": {
+                "description": "see if the server is up and running with this health check endpoint",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "Check API health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
