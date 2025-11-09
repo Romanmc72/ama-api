@@ -23,6 +23,10 @@ import (
 	"ama/api/logging"
 )
 
+type PingPong struct {
+	Ping string `json:"ping"`
+}
+
 // Ping godoc
 //
 //	@Summary		Check API health
@@ -30,10 +34,9 @@ import (
 //	@Tags			healthcheck
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	map[string]string
-//	@Example		{ "ping": "pong" }
+//	@Success		200	{object}	PingPong	"{\"ping\": \"pong\"}"
 //	@Router			/ping [get]
-func PingHandler(c *gin.Context) { c.IndentedJSON(http.StatusOK, map[string]string{"ping": "pong"}) }
+func Ping(c *gin.Context) { c.IndentedJSON(http.StatusOK, PingPong{Ping: "pong"}) }
 
 //	@BasePath	/
 
@@ -58,7 +61,7 @@ func main() {
 
 	router.Use(func(c *gin.Context) { auth.CORSHeaders(endpoints.NewAPIContext(c)) })
 
-	router.GET(constants.PingPath, PingHandler)
+	router.GET(constants.PingPath, Ping)
 
 	// Routes requiring the authorization header to be set
 	authorizedGroup := router.Group("/")

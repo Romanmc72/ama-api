@@ -9,7 +9,18 @@ import (
 	"strings"
 )
 
-// Given the user id, grab the user from the database
+// GetUserByUserId godoc
+//
+//	@Summary		Get a user given their ID
+//	@Description	Given the user id, grab the user from the database
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId	path		string	true	"User ID"
+//	@Success		200		{object}	application.User
+//	@Failure		400		{object}	responses.ErrorResponse
+//	@Failure		404		{object}	responses.ErrorResponse
+//	@Router			/user/{userId} [get]
 func GetUserByUserId(c interfaces.APIContext, db interfaces.UserReader) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)

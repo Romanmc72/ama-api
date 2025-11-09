@@ -1,4 +1,266 @@
 basePath: /
+definitions:
+  application.NewQuestion:
+    properties:
+      prompt:
+        description: The actual question itself.
+        type: string
+      tags:
+        description: The tags identifying what kind of question this is.
+        items:
+          type: string
+        type: array
+    required:
+    - prompt
+    - tags
+    type: object
+  application.Question:
+    properties:
+      prompt:
+        description: The actual question itself.
+        type: string
+      questionId:
+        description: The database identifier for this question.
+        type: string
+      tags:
+        description: The tags identifying what kind of question this is.
+        items:
+          type: string
+        type: array
+    required:
+    - prompt
+    - questionId
+    - tags
+    type: object
+  application.User:
+    properties:
+      email:
+        description: The user's username.
+        type: string
+      firebaseId:
+        description: The unique user identifier from firebase.
+        type: string
+      lists:
+        description: The list of question lists that the user has created.
+        items:
+          $ref: '#/definitions/list.List'
+        type: array
+      name:
+        description: The user's username.
+        type: string
+      settings:
+        allOf:
+        - $ref: '#/definitions/user.UserSettings'
+        description: The users settings and preferences.
+      subscription:
+        allOf:
+        - $ref: '#/definitions/user.UserSubscription'
+        description: The user's subscription information.
+      tier:
+        description: The user's subscription tier. One of "free" | "lite" | "premium"
+        type: string
+      userId:
+        description: The unique identifier for the user.
+        type: string
+    required:
+    - email
+    - firebaseId
+    - lists
+    - settings
+    - subscription
+    - tier
+    - userId
+    type: object
+  list.List:
+    properties:
+      listId:
+        description: The unique identifier for the list.
+        type: string
+      name:
+        description: The human readable name for the list
+        type: string
+    required:
+    - listId
+    - name
+    type: object
+  main.PingPong:
+    properties:
+      ping:
+        type: string
+    type: object
+  requests.PostUserListRequest:
+    properties:
+      name:
+        description: The name of the new list
+        type: string
+    required:
+    - name
+    type: object
+  requests.PostUserRequest:
+    properties:
+      email:
+        description: The user's username.
+        type: string
+      firebaseId:
+        description: The unique user identifier from firebase.
+        type: string
+      lists:
+        description: The list of question lists that the user has created.
+        items:
+          $ref: '#/definitions/list.List'
+        type: array
+      name:
+        description: The user's username.
+        type: string
+      settings:
+        allOf:
+        - $ref: '#/definitions/user.UserSettings'
+        description: The users settings and preferences.
+      subscription:
+        allOf:
+        - $ref: '#/definitions/user.UserSubscription'
+        description: The user's subscription information.
+      tier:
+        description: The user's subscription tier. One of "free" | "lite" | "premium"
+        type: string
+    required:
+    - email
+    - firebaseId
+    - settings
+    - subscription
+    - tier
+    type: object
+  requests.PutUserListRequest:
+    properties:
+      name:
+        description: The name for the list.
+        type: string
+    required:
+    - name
+    type: object
+  responses.DeleteUserResponse:
+    properties:
+      deleteTime:
+        type: integer
+      success:
+        type: boolean
+    type: object
+  responses.ErrorResponse:
+    properties:
+      error:
+        description: The text of the error itself
+        type: string
+    required:
+    - error
+    type: object
+  responses.GetUserListByIdResponse:
+    properties:
+      list:
+        $ref: '#/definitions/list.List'
+      questions:
+        items:
+          $ref: '#/definitions/application.Question'
+        type: array
+    type: object
+  responses.SuccessResponse:
+    properties:
+      success:
+        description: |-
+          This response means that the whole operation was successful, but this
+          can be false if for example the delete request attempted to delete
+          something that does not exist. It is "successful" in the sense
+          that the object intended for deletion does not exist after the request,
+          and unsuccessful in that the request played no part in the deletion.
+        type: boolean
+      time:
+        description: The approximate time on the server when the operation was completed.
+        type: integer
+    type: object
+  user.BaseUser:
+    properties:
+      email:
+        description: The user's username.
+        type: string
+      firebaseId:
+        description: The unique user identifier from firebase.
+        type: string
+      lists:
+        description: The list of question lists that the user has created.
+        items:
+          $ref: '#/definitions/list.List'
+        type: array
+      name:
+        description: The user's username.
+        type: string
+      settings:
+        allOf:
+        - $ref: '#/definitions/user.UserSettings'
+        description: The users settings and preferences.
+      subscription:
+        allOf:
+        - $ref: '#/definitions/user.UserSubscription'
+        description: The user's subscription information.
+      tier:
+        description: The user's subscription tier. One of "free" | "lite" | "premium"
+        type: string
+    required:
+    - email
+    - firebaseId
+    - lists
+    - settings
+    - subscription
+    - tier
+    type: object
+  user.UserColorScheme:
+    properties:
+      background:
+        description: |-
+          The hex code for the color to use in the background OR the word "default"
+          to use the default setting on the user's device.
+        type: string
+      foreground:
+        description: |-
+          The hex code for the color to use in the foreground OR the word "default"
+          to use the default setting on the user's device.
+        type: string
+      highlightedBackground:
+        description: |-
+          The hex code for the color to use in the highlighted background OR the
+          word "default" to use the default setting on the user's device.
+        type: string
+      highlightedForeground:
+        description: |-
+          The hex code for the color to use in the highlighted background OR the
+          word "default" to use the default setting on the user's device.
+        type: string
+    required:
+    - background
+    - foreground
+    - highlightedBackground
+    - highlightedForeground
+    type: object
+  user.UserSettings:
+    properties:
+      colorScheme:
+        allOf:
+        - $ref: '#/definitions/user.UserColorScheme'
+        description: The color scheme that the user has chose.
+    required:
+    - colorScheme
+    type: object
+  user.UserSubscription:
+    properties:
+      payCadence:
+        description: |-
+          How often a user makes payments for their subscription.
+          Currently "monthly" is the only supported value.
+        type: string
+      renewalDate:
+        description: When the next payment is to be made to renew the subscription.
+        type: string
+    required:
+    - renewalDate
+    type: object
 info:
   contact: {}
   title: Ask Me Anything API
@@ -12,12 +274,596 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: '{\"ping\": \"pong\"}'
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/main.PingPong'
       summary: Check API health
       tags:
       - healthcheck
+  /question:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all of the questions from the database given input query
+        parameters.
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Final ID from previous page
+        in: query
+        name: finalId
+        type: string
+      - description: Tag to match (specify multiple times for && match)
+        in: query
+        name: tag
+        type: integer
+      - description: Get a random question
+        in: query
+        name: random
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: The questions that were found (or weren't)
+          schema:
+            items:
+              $ref: '#/definitions/application.Question'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get zero or more questions
+      tags:
+      - question
+    post:
+      consumes:
+      - application/json
+      description: Will create a brand new question in the database.
+      parameters:
+      - description: Question data
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/application.NewQuestion'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/application.Question'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create a question
+      tags:
+      - question
+  /question/{questionId}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes one question using its id. If the question already does
+        not exist, this will return successfully.
+      parameters:
+      - description: Question ID
+        in: path
+        name: questionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete one question.
+      tags:
+      - question
+    get:
+      consumes:
+      - application/json
+      description: will get one question using its unique id.
+      parameters:
+      - description: Question ID
+        in: path
+        name: questionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/application.Question'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get one question.
+      tags:
+      - question
+    put:
+      consumes:
+      - application/json
+      description: Update an existing question in the database. If the question does
+        not exist it will be created.
+      parameters:
+      - description: Question ID
+        in: path
+        name: questionId
+        required: true
+        type: string
+      - description: Question data
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/application.NewQuestion'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: The created question
+          schema:
+            $ref: '#/definitions/application.Question'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Update a question given its ID
+      tags:
+      - question
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user in the database and returns that new user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/requests.PostUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/application.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create a user
+      tags:
+      - user
+  /user/{userId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user from the database given their user id
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.DeleteUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete a user given their ID
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: Given the user id, grab the user from the database
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/application.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get a user given their ID
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Updates the user given the user id and the update data
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.BaseUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Update a user given their ID
+      tags:
+      - user
+  /user/{userId}/list:
+    get:
+      consumes:
+      - application/json
+      description: Get all of the lists for a user.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/list.List'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get lists
+      tags:
+      - list
+    post:
+      consumes:
+      - application/json
+      description: Create a list
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: List data
+        in: body
+        name: list
+        required: true
+        schema:
+          $ref: '#/definitions/requests.PostUserListRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/list.List'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Create a list
+      tags:
+      - list
+  /user/{userId}/list/{listId}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes the list from the user profile and removes all questions
+        from the list. If the list does not exist, returns successfully.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: List ID
+        in: path
+        name: listId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete a list
+      tags:
+      - list
+    get:
+      consumes:
+      - application/json
+      description: Get a list and its questions from a given user list.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: List ID
+        in: path
+        name: listId
+        required: true
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Final ID from previous page
+        in: query
+        name: finalId
+        type: string
+      - description: Tag to match (specify multiple times for && match)
+        in: query
+        name: tag
+        type: integer
+      - description: Get a random question
+        in: query
+        name: random
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.GetUserListByIdResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get a list
+      tags:
+      - list question
+    put:
+      consumes:
+      - application/json
+      description: Update a list
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: List ID
+        in: path
+        name: listId
+        required: true
+        type: string
+      - description: List data
+        in: body
+        name: list
+        required: true
+        schema:
+          $ref: '#/definitions/requests.PutUserListRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Update a list
+      tags:
+      - list
+  /user/{userId}/list/{listId}/question/{questionId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a question from a list. If the question does not exist in
+        the list, returns successfully.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: List ID
+        in: path
+        name: listId
+        required: true
+        type: string
+      - description: Question ID
+        in: path
+        name: questionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Delete a question from a list
+      tags:
+      - list question
+    get:
+      consumes:
+      - application/json
+      description: Get a question from a list
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: List ID
+        in: path
+        name: listId
+        required: true
+        type: string
+      - description: Question ID
+        in: path
+        name: questionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/application.Question'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Get a question from a list
+      tags:
+      - list question
+    post:
+      consumes:
+      - application/json
+      description: Add a question to a list
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: List ID
+        in: path
+        name: listId
+        required: true
+        type: string
+      - description: Question ID
+        in: path
+        name: questionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Add a question to a list
+      tags:
+      - list question
 swagger: "2.0"

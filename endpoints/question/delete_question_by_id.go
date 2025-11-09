@@ -9,7 +9,17 @@ import (
 	"ama/api/logging"
 )
 
-// DeleteQuestionById(c *gin.Context) will delete one question using its id.
+//	DeleteQuestionById godoc
+//
+// @Summary		Delete one question.
+// @Description	Deletes one question using its id. If the question already does not exist, this will return successfully.
+// @Tags			question
+// @Accept			json
+// @Produce		json
+// @Param			questionId	path		string	true	"Question ID"
+// @Success		200			{object}	responses.SuccessResponse
+// @Failure		500			{object}	responses.ErrorResponse
+// @Router			/question/{questionId} [delete]
 func DeleteQuestionById(c interfaces.APIContext, db interfaces.QuestionDeleter) {
 	logger := logging.GetLogger()
 	id := c.Param(constants.QuestionIdPathIdentifier)

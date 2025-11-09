@@ -11,8 +11,19 @@ import (
 	"ama/api/logging"
 )
 
-// PutQuestionsById(c *gin.Context) will update an existing question in the database.
-// If the question does not exist it will be created.
+// PutQuestionsById godoc
+//
+//	@Summary		Update a question given its ID
+//	@Description	Update an existing question in the database. If the question does not exist it will be created.
+//	@Tags			question
+//	@Accept			json
+//	@Produce		json
+//	@Param			questionId	path		string					true	"Question ID"
+//	@Param			question	body		application.NewQuestion	true	"Question data"
+//	@Success		200			{object}	application.Question	"The created question"
+//	@Failure		400			{object}	responses.ErrorResponse
+//	@Failure		500			{object}	responses.ErrorResponse
+//	@Router			/question/{questionId} [put]
 func PutQuestionById(c interfaces.APIContext, db interfaces.QuestionWriter) {
 	logger := logging.GetLogger()
 	id := c.Param(constants.QuestionIdPathIdentifier)

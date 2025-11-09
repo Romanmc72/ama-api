@@ -11,7 +11,19 @@ import (
 	"strings"
 )
 
-// Updates the user given the user id and the update data
+// PutUserByUserId godoc
+//
+//	@Summary		Update a user given their ID
+//	@Description	Updates the user given the user id and the update data
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId	path		string			true	"User ID"
+//	@Param			user	body		user.BaseUser	true	"User data"
+//	@Success		200		{object}	nil
+//	@Failure		400		{object}	responses.ErrorResponse
+//	@Failure		500		{object}	responses.ErrorResponse
+//	@Router			/user/{userId} [put]
 func PutUserByUserId(c interfaces.APIContext, db interfaces.UserWriter) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)

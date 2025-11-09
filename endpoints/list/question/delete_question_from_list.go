@@ -9,6 +9,20 @@ import (
 	"strings"
 )
 
+// DeleteQuestionFromList godoc
+//
+//	@Summary		Delete a question from a list
+//	@Description	Delete a question from a list. If the question does not exist in the list, returns successfully.
+//	@Tags			list question
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId		path		string	true	"User ID"
+//	@Param			listId		path		string	true	"List ID"
+//	@Param			questionId	path		string	true	"Question ID"
+//	@Success		200			{object}	responses.SuccessResponse
+//	@Failure		400			{object}	responses.ErrorResponse
+//	@Failure		500			{object}	responses.ErrorResponse
+//	@Router			/user/{userId}/list/{listId}/question/{questionId} [delete]
 func DeleteQuestionFromList(c interfaces.APIContext, db interfaces.ListUpdater) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)

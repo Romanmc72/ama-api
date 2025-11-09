@@ -11,7 +11,19 @@ import (
 	"strings"
 )
 
-// Deletes the list from the user profile and removes all questions from the list
+// DeleteUserListByID godoc
+//
+//	@Summary		Delete a list
+//	@Description	Deletes the list from the user profile and removes all questions from the list. If the list does not exist, returns successfully.
+//	@Tags			list
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId	path		string	true	"User ID"
+//	@Param			listId	path		string	true	"List ID"
+//	@Success		200		{object}	nil
+//	@Failure		400		{object}	responses.ErrorResponse
+//	@Failure		500		{object}	responses.ErrorResponse
+//	@Router			/user/{userId}/list/{listId} [delete]
 func DeleteUserListByID(c interfaces.APIContext, db interfaces.ListDeleter) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)

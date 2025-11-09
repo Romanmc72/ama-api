@@ -11,6 +11,20 @@ import (
 	"strings"
 )
 
+// PutUserListById godoc
+//
+//	@Summary		Update a list
+//	@Description	Update a list
+//	@Tags			list
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId	path		string						true	"User ID"
+//	@Param			listId	path		string						true	"List ID"
+//	@Param			list	body		requests.PutUserListRequest	true	"List data"
+//	@Success		200		{object}	responses.SuccessResponse
+//	@Failure		400		{object}	responses.ErrorResponse
+//	@Failure		500		{object}	responses.ErrorResponse
+//	@Router			/user/{userId}/list/{listId} [put]
 func PutUserListById(c interfaces.APIContext, db interfaces.ListUpdater) {
 	body := "body"
 	logger := logging.GetLogger()

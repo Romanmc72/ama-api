@@ -11,7 +11,20 @@ import (
 	"ama/api/logging"
 )
 
-// GetQuestions(c *gin.Context) retrieves all of the questions from the database.
+// GetQuestions godoc
+//
+//	@Summary		Get zero or more questions
+//	@Description	Retrieves all of the questions from the database given input query parameters.
+//	@Tags			question
+//	@Accept			json
+//	@Produce		json
+//	@Param			limit	query		int						false	"Limit"
+//	@Param			finalId	query		string					false	"Final ID from previous page"
+//	@Param			tag		query		int						false	"Tag to match (specify multiple times for && match)"
+//	@Param			random	query		bool					false	"Get a random question"
+//	@Success		201		{object}	[]application.Question	"The questions that were found (or weren't)"
+//	@Failure		500		{object}	responses.ErrorResponse
+//	@Router			/question [get]
 func GetQuestions(c interfaces.APIContext, db interfaces.QuestionReader) {
 	logger := logging.GetLogger()
 	limit, finalId, tags, random := endpoints.GetReadQuestionsParamsWithDefaults(c)

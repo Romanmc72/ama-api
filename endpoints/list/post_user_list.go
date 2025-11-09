@@ -12,6 +12,19 @@ import (
 	"strings"
 )
 
+// PostUserList godoc
+//
+//	@Summary		Create a list
+//	@Description	Create a list
+//	@Tags			list
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId	path		string							true	"User ID"
+//	@Param			list	body		requests.PostUserListRequest	true	"List data"
+//	@Success		201		{object}	list.List
+//	@Failure		400		{object}	responses.ErrorResponse
+//	@Failure		500		{object}	responses.ErrorResponse
+//	@Router			/user/{userId}/list [post]
 func PostUserList(c interfaces.APIContext, db interfaces.ListCreator) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)

@@ -8,7 +8,18 @@ import (
 	"net/http"
 )
 
-// Creates a new user in the database and returns that new user
+// PostUser godoc
+//
+//	@Summary		Create a user
+//	@Description	Creates a new user in the database and returns that new user
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		requests.PostUserRequest	true	"User data"
+//	@Success		201		{object}	application.User
+//	@Failure		400		{object}	responses.ErrorResponse
+//	@Failure		500		{object}	responses.ErrorResponse
+//	@Router			/user [post]
 func PostUser(c interfaces.APIContext, db interfaces.UserCreator) {
 	logger := logging.GetLogger()
 	var postReq requests.PostUserRequest

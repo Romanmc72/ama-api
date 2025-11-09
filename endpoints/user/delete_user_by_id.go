@@ -9,7 +9,18 @@ import (
 	"strings"
 )
 
-// Delete a user from the database given their user id
+// DeleteUserById godoc
+//
+//	@Summary		Delete a user given their ID
+//	@Description	Delete a user from the database given their user id
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId	path		string	true	"User ID"
+//	@Success		200		{object}	responses.DeleteUserResponse
+//	@Failure		400		{object}	responses.ErrorResponse
+//	@Failure		500		{object}	responses.ErrorResponse
+//	@Router			/user/{userId} [delete]
 func DeleteUserById(c interfaces.APIContext, deleter interfaces.UserDeleter) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)

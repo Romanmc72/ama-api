@@ -12,7 +12,18 @@ import (
 	"ama/api/logging"
 )
 
-// GetQuestionById(c *gin.Context) will get one question using its unique id.
+//	GetQuestionById godoc
+//
+// @Summary		Get one question.
+// @Description	will get one question using its unique id.
+// @Tags			question
+// @Accept			json
+// @Produce		json
+// @Param			questionId	path		string	true	"Question ID"
+// @Success		200			{object}	application.Question
+// @Failure		404			{object}	responses.ErrorResponse
+// @Failure		500			{object}	responses.ErrorResponse
+// @Router			/question/{questionId} [get]
 func GetQuestionById(c interfaces.APIContext, db interfaces.QuestionReader) {
 	logger := logging.GetLogger()
 	id := c.Param(constants.QuestionIdPathIdentifier)

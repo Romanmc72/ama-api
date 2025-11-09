@@ -9,6 +9,21 @@ import (
 	"strings"
 )
 
+// PostQuestionToList godoc
+//
+//	@Summary		Add a question to a list
+//	@Description	Add a question to a list
+//	@Tags			list question
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId		path		string	true	"User ID"
+//	@Param			listId		path		string	true	"List ID"
+//	@Param			questionId	path		string	true	"Question ID"
+//	@Success		200			{object}	responses.SuccessResponse
+//	@Failure		400			{object}	responses.ErrorResponse
+//	@Failure		404			{object}	responses.ErrorResponse
+//	@Failure		500			{object}	responses.ErrorResponse
+//	@Router			/user/{userId}/list/{listId}/question/{questionId} [post]
 func PostQuestionToList(c interfaces.APIContext, db interfaces.ListUpdater) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)

@@ -10,6 +10,18 @@ import (
 	"net/http"
 )
 
+// GetUserLists godoc
+//
+//	@Summary		Get lists
+//	@Description	Get all of the lists for a user.
+//	@Tags			list
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId	path		string	true	"User ID"
+//	@Success		201		{object}	[]list.List
+//	@Failure		400		{object}	responses.ErrorResponse
+//	@Failure		404		{object}	responses.ErrorResponse
+//	@Router			/user/{userId}/list [get]
 func GetUserLists(c interfaces.APIContext, db interfaces.UserReader) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)

@@ -10,6 +10,24 @@ import (
 	"strings"
 )
 
+// GetUserListById godoc
+//
+//	@Summary		Get a list
+//	@Description	Get a list and its questions from a given user list.
+//	@Tags			list question
+//	@Accept			json
+//	@Produce		json
+//	@Param			userId	path		string	true	"User ID"
+//	@Param			listId	path		string	true	"List ID"
+//	@Param			limit	query		int		false	"Limit"
+//	@Param			finalId	query		string	false	"Final ID from previous page"
+//	@Param			tag		query		int		false	"Tag to match (specify multiple times for && match)"
+//	@Param			random	query		bool	false	"Get a random question"
+//	@Success		200		{object}	responses.GetUserListByIdResponse
+//	@Failure		400		{object}	responses.ErrorResponse
+//	@Failure		404		{object}	responses.ErrorResponse
+//	@Failure		500		{object}	responses.ErrorResponse
+//	@Router			/user/{userId}/list/{listId} [get]
 func GetUserListById(c interfaces.APIContext, db interfaces.ListReader) {
 	logger := logging.GetLogger()
 	userId := c.Param(constants.UserIdPathIdentifier)
