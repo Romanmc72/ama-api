@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -43,12 +44,19 @@ func Ping(c *gin.Context) { c.IndentedJSON(http.StatusOK, PingPong{Ping: "pong"}
 // main() is the main entrypoint for the program that starts and serves the API.
 //
 //	@title	Ask Me Anything API
+// @securityDefinitions.apiKey token
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 func main() {
 	port := flag.Int("port", 8088, "The port to launch the server on. Default=8088.")
 	flag.Parse()
 
 	logger := logging.GetLogger()
 	router := gin.Default()
+	if envName := os.Getenv("ENVIRONMENT_NAME"); envName == constants.DevelopmentEnvironmentName {
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	}
 	jwtVerifier, err := auth.NewAuthClient()
 	if err != nil {
 		logger.Error("Could not connect to Firebase", "error", err)
@@ -167,7 +175,6 @@ func main() {
 
 	// User question list endpoints
 	logger.Info("Starting the server")
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	router.Run(fmt.Sprintf("0.0.0.0:%d", *port))
 	logger.Info("Shutting down the server")
 }

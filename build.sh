@@ -41,8 +41,11 @@ help() {
 	echo '| deploy'
 	echo '|		Package and ship the executable to its destination.'
 	echo '|'
-	echo '| release'
+	echo '| ci'
 	echo '|		Run several commands all together to lint, test, build, and deploy'
+	echo '|'
+	echo '| docs'
+	echo '|		Generates the openapi documentation (development only)'
 	echo ''
 }
 
@@ -60,6 +63,7 @@ _set_env_vars() {
 	export FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099
 	export FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 && \
 	export PROJECT_ID=ama-dev && \
+	export ENVIRONMENT_NAME=development && \
 	export GO_LOG=debug
 }
 
@@ -198,6 +202,11 @@ ci() {
 	test
 	build
 	deploy
+}
+
+docs() {
+	swag init
+	npx swagger2openapi docs/swagger.json --outfile docs/openapi.yaml
 }
 
 main() {

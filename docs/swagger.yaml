@@ -866,4 +866,10 @@ paths:
       summary: Add a question to a list
       tags:
       - list question
+securityDefinitions:
+  token:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

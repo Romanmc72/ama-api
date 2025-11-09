@@ -20,6 +20,7 @@ WORKDIR /home/ama
 EXPOSE 8088
 
 # The GCP Project ID this app will point at (default is dev)
+ENV ENVIRONMENT_NAME='development'
 ENV PROJECT_ID='ama-dev-414718'
 ENV GO_LOG='info'
 

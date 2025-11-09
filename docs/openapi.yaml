@@ -1,0 +1,952 @@
+openapi: 3.0.0
+info:
+  title: Ask Me Anything API
+  contact: {}
+  version: "2.0"
+paths:
+  /ping:
+    get:
+      description: see if the server is up and running with this health check endpoint
+      tags:
+        - healthcheck
+      summary: Check API health
+      responses:
+        "200":
+          description: '{\"ping\": \"pong\"}'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/main.PingPong"
+  /question:
+    get:
+      description: Retrieves all of the questions from the database given input query
+        parameters.
+      tags:
+        - question
+      summary: Get zero or more questions
+      parameters:
+        - description: Limit
+          name: limit
+          in: query
+          schema:
+            type: integer
+        - description: Final ID from previous page
+          name: finalId
+          in: query
+          schema:
+            type: string
+        - description: Tag to match (specify multiple times for && match)
+          name: tag
+          in: query
+          schema:
+            type: integer
+        - description: Get a random question
+          name: random
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "201":
+          description: The questions that were found (or weren't)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/application.Question"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    post:
+      description: Will create a brand new question in the database.
+      tags:
+        - question
+      summary: Create a question
+      requestBody:
+        $ref: "#/components/requestBodies/application.NewQuestion"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/application.Question"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+  "/question/{questionId}":
+    get:
+      description: will get one question using its unique id.
+      tags:
+        - question
+      summary: Get one question.
+      parameters:
+        - description: Question ID
+          name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/application.Question"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    put:
+      description: Update an existing question in the database. If the question does
+        not exist it will be created.
+      tags:
+        - question
+      summary: Update a question given its ID
+      parameters:
+        - description: Question ID
+          name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/application.NewQuestion"
+      responses:
+        "200":
+          description: The created question
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/application.Question"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    delete:
+      description: Deletes one question using its id. If the question already does not
+        exist, this will return successfully.
+      tags:
+        - question
+      summary: Delete one question.
+      parameters:
+        - description: Question ID
+          name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.SuccessResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+  /user:
+    post:
+      description: Creates a new user in the database and returns that new user
+      tags:
+        - user
+      summary: Create a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requests.PostUserRequest"
+        description: User data
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/application.User"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+  "/user/{userId}":
+    get:
+      description: Given the user id, grab the user from the database
+      tags:
+        - user
+      summary: Get a user given their ID
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/application.User"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    put:
+      description: Updates the user given the user id and the update data
+      tags:
+        - user
+      summary: Update a user given their ID
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user.BaseUser"
+        description: User data
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    delete:
+      description: Delete a user from the database given their user id
+      tags:
+        - user
+      summary: Delete a user given their ID
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.DeleteUserResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+  "/user/{userId}/list":
+    get:
+      description: Get all of the lists for a user.
+      tags:
+        - list
+      summary: Get lists
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/list.List"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    post:
+      description: Create a list
+      tags:
+        - list
+      summary: Create a list
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requests.PostUserListRequest"
+        description: List data
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/list.List"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+  "/user/{userId}/list/{listId}":
+    get:
+      description: Get a list and its questions from a given user list.
+      tags:
+        - list question
+      summary: Get a list
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: List ID
+          name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: Limit
+          name: limit
+          in: query
+          schema:
+            type: integer
+        - description: Final ID from previous page
+          name: finalId
+          in: query
+          schema:
+            type: string
+        - description: Tag to match (specify multiple times for && match)
+          name: tag
+          in: query
+          schema:
+            type: integer
+        - description: Get a random question
+          name: random
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.GetUserListByIdResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    put:
+      description: Update a list
+      tags:
+        - list
+      summary: Update a list
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: List ID
+          name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requests.PutUserListRequest"
+        description: List data
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.SuccessResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    delete:
+      description: Deletes the list from the user profile and removes all questions
+        from the list. If the list does not exist, returns successfully.
+      tags:
+        - list
+      summary: Delete a list
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: List ID
+          name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+  "/user/{userId}/list/{listId}/question/{questionId}":
+    get:
+      description: Get a question from a list
+      tags:
+        - list question
+      summary: Get a question from a list
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: List ID
+          name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: Question ID
+          name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/application.Question"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    post:
+      description: Add a question to a list
+      tags:
+        - list question
+      summary: Add a question to a list
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: List ID
+          name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: Question ID
+          name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.SuccessResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+    delete:
+      description: Delete a question from a list. If the question does not exist in
+        the list, returns successfully.
+      tags:
+        - list question
+      summary: Delete a question from a list
+      parameters:
+        - description: User ID
+          name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: List ID
+          name: listId
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: Question ID
+          name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.SuccessResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/responses.ErrorResponse"
+servers:
+  - url: /
+components:
+  requestBodies:
+    application.NewQuestion:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/application.NewQuestion"
+      description: Question data
+      required: true
+  securitySchemes:
+    token:
+      description: Type "Bearer" followed by a space and JWT token.
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    application.NewQuestion:
+      type: object
+      required:
+        - prompt
+        - tags
+      properties:
+        prompt:
+          description: The actual question itself.
+          type: string
+        tags:
+          description: The tags identifying what kind of question this is.
+          type: array
+          items:
+            type: string
+    application.Question:
+      type: object
+      required:
+        - prompt
+        - questionId
+        - tags
+      properties:
+        prompt:
+          description: The actual question itself.
+          type: string
+        questionId:
+          description: The database identifier for this question.
+          type: string
+        tags:
+          description: The tags identifying what kind of question this is.
+          type: array
+          items:
+            type: string
+    application.User:
+      type: object
+      required:
+        - email
+        - firebaseId
+        - lists
+        - settings
+        - subscription
+        - tier
+        - userId
+      properties:
+        email:
+          description: The user's username.
+          type: string
+        firebaseId:
+          description: The unique user identifier from firebase.
+          type: string
+        lists:
+          description: The list of question lists that the user has created.
+          type: array
+          items:
+            $ref: "#/components/schemas/list.List"
+        name:
+          description: The user's username.
+          type: string
+        settings:
+          description: The users settings and preferences.
+          allOf:
+            - $ref: "#/components/schemas/user.UserSettings"
+        subscription:
+          description: The user's subscription information.
+          allOf:
+            - $ref: "#/components/schemas/user.UserSubscription"
+        tier:
+          description: The user's subscription tier. One of "free" | "lite" | "premium"
+          type: string
+        userId:
+          description: The unique identifier for the user.
+          type: string
+    list.List:
+      type: object
+      required:
+        - listId
+        - name
+      properties:
+        listId:
+          description: The unique identifier for the list.
+          type: string
+        name:
+          description: The human readable name for the list
+          type: string
+    main.PingPong:
+      type: object
+      properties:
+        ping:
+          type: string
+    requests.PostUserListRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          description: The name of the new list
+          type: string
+    requests.PostUserRequest:
+      type: object
+      required:
+        - email
+        - firebaseId
+        - settings
+        - subscription
+        - tier
+      properties:
+        email:
+          description: The user's username.
+          type: string
+        firebaseId:
+          description: The unique user identifier from firebase.
+          type: string
+        lists:
+          description: The list of question lists that the user has created.
+          type: array
+          items:
+            $ref: "#/components/schemas/list.List"
+        name:
+          description: The user's username.
+          type: string
+        settings:
+          description: The users settings and preferences.
+          allOf:
+            - $ref: "#/components/schemas/user.UserSettings"
+        subscription:
+          description: The user's subscription information.
+          allOf:
+            - $ref: "#/components/schemas/user.UserSubscription"
+        tier:
+          description: The user's subscription tier. One of "free" | "lite" | "premium"
+          type: string
+    requests.PutUserListRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          description: The name for the list.
+          type: string
+    responses.DeleteUserResponse:
+      type: object
+      properties:
+        deleteTime:
+          type: integer
+        success:
+          type: boolean
+    responses.ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          description: The text of the error itself
+          type: string
+    responses.GetUserListByIdResponse:
+      type: object
+      properties:
+        list:
+          $ref: "#/components/schemas/list.List"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/application.Question"
+    responses.SuccessResponse:
+      type: object
+      properties:
+        success:
+          description: >-
+            This response means that the whole operation was successful, but
+            this
+
+            can be false if for example the delete request attempted to delete
+
+            something that does not exist. It is "successful" in the sense
+
+            that the object intended for deletion does not exist after the request,
+
+            and unsuccessful in that the request played no part in the deletion.
+          type: boolean
+        time:
+          description: The approximate time on the server when the operation was completed.
+          type: integer
+    user.BaseUser:
+      type: object
+      required:
+        - email
+        - firebaseId
+        - lists
+        - settings
+        - subscription
+        - tier
+      properties:
+        email:
+          description: The user's username.
+          type: string
+        firebaseId:
+          description: The unique user identifier from firebase.
+          type: string
+        lists:
+          description: The list of question lists that the user has created.
+          type: array
+          items:
+            $ref: "#/components/schemas/list.List"
+        name:
+          description: The user's username.
+          type: string
+        settings:
+          description: The users settings and preferences.
+          allOf:
+            - $ref: "#/components/schemas/user.UserSettings"
+        subscription:
+          description: The user's subscription information.
+          allOf:
+            - $ref: "#/components/schemas/user.UserSubscription"
+        tier:
+          description: The user's subscription tier. One of "free" | "lite" | "premium"
+          type: string
+    user.UserColorScheme:
+      type: object
+      required:
+        - background
+        - foreground
+        - highlightedBackground
+        - highlightedForeground
+      properties:
+        background:
+          description: >-
+            The hex code for the color to use in the background OR the word
+            "default"
+
+            to use the default setting on the user's device.
+          type: string
+        foreground:
+          description: >-
+            The hex code for the color to use in the foreground OR the word
+            "default"
+
+            to use the default setting on the user's device.
+          type: string
+        highlightedBackground:
+          description: >-
+            The hex code for the color to use in the highlighted background OR
+            the
+
+            word "default" to use the default setting on the user's device.
+          type: string
+        highlightedForeground:
+          description: >-
+            The hex code for the color to use in the highlighted background OR
+            the
+
+            word "default" to use the default setting on the user's device.
+          type: string
+    user.UserSettings:
+      type: object
+      required:
+        - colorScheme
+      properties:
+        colorScheme:
+          description: The color scheme that the user has chose.
+          allOf:
+            - $ref: "#/components/schemas/user.UserColorScheme"
+    user.UserSubscription:
+      type: object
+      required:
+        - renewalDate
+      properties:
+        payCadence:
+          description: |-
+            How often a user makes payments for their subscription.
+            Currently "monthly" is the only supported value.
+          type: string
+        renewalDate:
+          description: When the next payment is to be made to renew the subscription.
+          type: string
