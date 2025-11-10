@@ -264,6 +264,7 @@ definitions:
 info:
   contact: {}
   title: Ask Me Anything API
+  version: v1
 paths:
   /ping:
     get:
@@ -295,10 +296,13 @@ paths:
         in: query
         name: finalId
         type: string
-      - description: Tag to match (specify multiple times for && match)
+      - collectionFormat: csv
+        description: Tag to match (specify multiple times for && match)
         in: query
+        items:
+          type: string
         name: tag
-        type: integer
+        type: array
       - description: Get a random question
         in: query
         name: random
@@ -677,10 +681,13 @@ paths:
         in: query
         name: finalId
         type: string
-      - description: Tag to match (specify multiple times for && match)
+      - collectionFormat: csv
+        description: Tag to match (specify multiple times for && match)
         in: query
+        items:
+          type: string
         name: tag
-        type: integer
+        type: array
       - description: Get a random question
         in: query
         name: random

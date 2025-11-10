@@ -44,6 +44,8 @@ func Ping(c *gin.Context) { c.IndentedJSON(http.StatusOK, PingPong{Ping: "pong"}
 // main() is the main entrypoint for the program that starts and serves the API.
 //
 //	@title	Ask Me Anything API
+//	@version	v1
+//
 // @securityDefinitions.apiKey token
 // @in header
 // @name Authorization

@@ -20,7 +20,7 @@ import (
 //	@Produce		json
 //	@Param			limit	query		int						false	"Limit"
 //	@Param			finalId	query		string					false	"Final ID from previous page"
-//	@Param			tag		query		int						false	"Tag to match (specify multiple times for && match)"
+//	@Param			tag		query		[]string						false	"Tag to match (specify multiple times for && match)"
 //	@Param			random	query		bool					false	"Get a random question"
 //	@Success		201		{object}	[]application.Question	"The questions that were found (or weren't)"
 //	@Failure		500		{object}	responses.ErrorResponse

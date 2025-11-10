@@ -65,7 +65,11 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
                         "description": "Tag to match (specify multiple times for \u0026\u0026 match)",
                         "name": "tag",
                         "in": "query"
@@ -590,7 +594,11 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
                         "description": "Tag to match (specify multiple times for \u0026\u0026 match)",
                         "name": "tag",
                         "in": "query"
@@ -1288,7 +1296,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "v1",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},

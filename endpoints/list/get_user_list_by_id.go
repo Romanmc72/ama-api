@@ -21,7 +21,7 @@ import (
 //	@Param			listId	path		string	true	"List ID"
 //	@Param			limit	query		int		false	"Limit"
 //	@Param			finalId	query		string	false	"Final ID from previous page"
-//	@Param			tag		query		int		false	"Tag to match (specify multiple times for && match)"
+//	@Param			tag		query		[]string		false	"Tag to match (specify multiple times for && match)"
 //	@Param			random	query		bool	false	"Get a random question"
 //	@Success		200		{object}	responses.GetUserListByIdResponse
 //	@Failure		400		{object}	responses.ErrorResponse
